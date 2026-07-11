@@ -3,6 +3,13 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { loadDesignSections, loadIndex, type Entry } from "@/lib/catalog";
 import { SiteFooter } from "@/app/_components/site-footer";
+import { SITE_NAME, absoluteUrl } from "@/lib/site";
+
+/** セルの検索用 description（業種 × カラー × ムード + タグ）。 */
+function cellDescription(entry: Entry): string {
+  const tags = entry.tags.length > 0 ? `。タグ: ${entry.tags.join(", ")}` : "";
+  return `業種 (JSIC) ${entry.jsic} × カラー ${entry.color} × ムード ${entry.mood} の DESIGN.md。AI がそのまま読んで一貫した UI を生成できるオープンカタログのセル${tags}。`;
+}
 
 /** 静的エクスポート: index.json の全 id をビルド時に列挙する。 */
 export function generateStaticParams(): { id: string }[] {
@@ -23,7 +30,28 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const entry = findEntry(id);
-  return { title: entry ? entry.title : "セルが見つかりません" };
+  if (!entry) return { title: "セルが見つかりません" };
+
+  const canonical = `/cells/${entry.id}/`;
+  const description = cellDescription(entry);
+  return {
+    title: entry.title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: `${entry.title} — ${SITE_NAME}`,
+      description,
+      type: "article",
+      siteName: SITE_NAME,
+      locale: "ja_JP",
+      url: canonical,
+    },
+    twitter: {
+      card: "summary",
+      title: `${entry.title} — ${SITE_NAME}`,
+      description,
+    },
+  };
 }
 
 export default async function CellPage({
@@ -38,8 +66,29 @@ export default async function CellPage({
   const index = loadIndex();
   const sections = loadDesignSections(entry.path);
 
+  // 構造化データ (JSON-LD)。検索エンジンにセルの意味 (作品/データセット項目) を伝える。
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: entry.title,
+    description: cellDescription(entry),
+    url: absoluteUrl(`/cells/${entry.id}/`),
+    identifier: entry.id,
+    inLanguage: "ja",
+    license: "https://opensource.org/licenses/MIT",
+    isPartOf: { "@type": "Collection", name: SITE_NAME, url: absoluteUrl("/") },
+    keywords: [entry.jsic, entry.color, entry.mood, ...entry.tags].join(", "),
+    dateCreated: entry.createdAt,
+    dateModified: entry.updatedAt ?? entry.createdAt,
+  };
+
   return (
     <main className="wrap detail">
+      <script
+        type="application/ld+json"
+        // ビルド時に信頼済みの自リポジトリ由来メタのみを埋め込む。
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link className="back" href="/">
         ← カタログへ戻る
       </Link>

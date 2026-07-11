@@ -13,6 +13,7 @@ export type Entry = {
   title: string;
   hash: string;
   createdAt: string;
+  updatedAt?: string;
 };
 
 export type IndexFile = {
