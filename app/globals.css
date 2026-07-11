@@ -214,3 +214,106 @@ a:hover {
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
+
+/* --- DESIGN.md 本文 --- */
+.design {
+  margin-top: 2.75rem;
+}
+
+.design-title {
+  font-size: 1.15rem;
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.design-section {
+  margin-top: 2rem;
+}
+
+.design-section > h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem;
+  scroll-margin-top: 1rem;
+}
+
+.design-section > h3 .section-id {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.85rem;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.design-body {
+  color: var(--fg);
+}
+
+.design-body p {
+  margin: 0 0 0.9rem;
+}
+
+.design-body ul,
+.design-body ol {
+  margin: 0 0 0.9rem;
+  padding-left: 1.4rem;
+}
+
+.design-body li {
+  margin: 0.2rem 0;
+}
+
+.design-body li::marker {
+  color: var(--muted);
+}
+
+.design-body code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: var(--chip);
+  border-radius: 4px;
+  padding: 0.08rem 0.35rem;
+}
+
+.design-body pre {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+}
+
+.design-body pre code {
+  background: none;
+  padding: 0;
+}
+
+.design-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  display: block;
+  overflow-x: auto;
+}
+
+.design-body th,
+.design-body td {
+  border: 1px solid var(--border);
+  padding: 0.45rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.design-body th {
+  background: var(--card);
+  font-weight: 650;
+}
+
+.design-body a {
+  text-decoration: underline;
+}
+
+.design-empty {
+  margin-top: 2.75rem;
+  color: var(--muted);
+}
