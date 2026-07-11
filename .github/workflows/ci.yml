@@ -34,6 +34,8 @@ jobs:
         run: pnpm run validate:jsic
       - name: 法務チェック (de-brand / オープン書体 / 出典表示 · SSOT §8)
         run: pnpm run legal:check
+      - name: a11y 不変条件チェック (skip-link / landmark / focus / contrast · #23)
+        run: pnpm run a11y:check
 
   secrets-scan:
     name: gitleaks (機密検出)
