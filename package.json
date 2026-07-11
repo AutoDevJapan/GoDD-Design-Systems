@@ -1,0 +1,19 @@
+{
+  "name": "godd-design-systems",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "GoDD Design-Systems: 材化済み DESIGN.md コーパスと分類語彙 (公開 MIT)。",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "validate:index": "node scripts/validate-index.mjs",
+    "validate": "npm run validate:index"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}

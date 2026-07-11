@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/AutoDevJapan/GoDD-Design-Systems/main/documents/schema/index.schema.json",
+  "title": "GoDD Design-Systems index.json",
+  "description": "材化済みセル (design-md/{jsic}/{color}/{mood}/) のメタデータ一覧。追記 (accrete) 方式で成長する公開在庫の単一情報源。SSOT §2, §5 準拠。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "entries"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "任意。本ファイルを検証する JSON Schema への参照 (エディタ補完用)。"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "index.json スキーマのメジャーバージョン。破壊的変更時に increment する。"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "任意。この index を最後に生成/更新した時刻 (ISO 8601 / RFC 3339, UTC 推奨)。"
+    },
+    "entries": {
+      "type": "array",
+      "description": "材化済みセルのメタデータ。id で一意。accrete: 既存 entry は原則不変、追加のみ。",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "taxonomy.md §0 の slug 規則。小文字英数字とハイフンのみ、先頭/末尾/連続ハイフン禁止。"
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "jsic", "color", "mood", "title", "hash", "createdAt"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9]{4}_[a-z0-9]+(-[a-z0-9]+)*_[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "セルの安定 ID。形式 `{jsic}_{color}_{mood}`。URL/参照キーとして不変。"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^design-md/[0-9]{4}/[a-z0-9]+(-[a-z0-9]+)*/[a-z0-9]+(-[a-z0-9]+)*/DESIGN\\.md$",
+          "description": "リポジトリ相対の DESIGN.md パス。ディレクトリ構造 design-md/{jsic}/{color}/{mood}/DESIGN.md に一致。"
+        },
+        "jsic": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$",
+          "description": "JSIC 細分類コード (4桁)。出典 jsic.json (Issue #3)。"
+        },
+        "color": {
+          "$ref": "#/$defs/slug",
+          "description": "カラー軸の slug。taxonomy.md §1 の語彙 (有彩色 {hue}-{tone} または無彩色 slug)。"
+        },
+        "mood": {
+          "$ref": "#/$defs/slug",
+          "description": "ムード軸の slug。taxonomy.md §2 の語彙 (通常1セル1つ)。"
+        },
+        "tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/slug" },
+          "description": "任意。タイポ体系・レイアウト原型など、軸に掛けない差別化/検索用タグ (SSOT §2)。"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "人間可読の見出し (ブラウズ/SEO 用)。"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "DESIGN.md 本文の内容ハッシュ。形式 `sha256:{64桁hex}`。変更検知/near-dup 用。"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "材化 (初回生成) 時刻。ISO 8601 / RFC 3339。accrete のため不変。"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "任意。再材化/更新時刻。ISO 8601 / RFC 3339。"
+        },
+        "license": {
+          "type": "string",
+          "description": "任意。このセルのライセンス識別子 (SPDX)。既定はリポジトリの MIT。",
+          "default": "MIT"
+        }
+      }
+    }
+  }
+}
