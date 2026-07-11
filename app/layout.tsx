@@ -35,7 +35,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        {/* キーボード / スクリーンリーダ利用者が反復コンテンツを飛ばして本文へ */}
+        <a className="skip-link" href="#main-content">
+          本文へスキップ
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

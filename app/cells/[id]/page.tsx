@@ -82,16 +82,20 @@ export default async function CellPage({
     dateModified: entry.updatedAt ?? entry.createdAt,
   };
 
+  // ランドマーク整理: nav(パンくず) / header(banner) / main / footer(contentinfo)
+  // を .wrap 直下の兄弟に配置する。
   return (
-    <main className="wrap detail">
+    <div className="wrap detail">
       <script
         type="application/ld+json"
         // ビルド時に信頼済みの自リポジトリ由来メタのみを埋め込む。
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Link className="back" href="/">
-        ← カタログへ戻る
-      </Link>
+      <nav className="back-nav" aria-label="パンくず">
+        <Link className="back" href="/">
+          ← カタログへ戻る
+        </Link>
+      </nav>
       <header className="site-header">
         <h1>{entry.title}</h1>
         <p>
@@ -101,6 +105,7 @@ export default async function CellPage({
         </p>
       </header>
 
+      <main id="main-content" tabIndex={-1}>
       <dl>
         <dt>id</dt>
         <dd>{entry.id}</dd>
@@ -143,8 +148,9 @@ export default async function CellPage({
           このセルはまだ DESIGN.md 本文が材化されていません（上記パスを参照）。
         </p>
       )}
+      </main>
 
       <SiteFooter generatedAt={index.generatedAt} />
-    </main>
+    </div>
   );
 }

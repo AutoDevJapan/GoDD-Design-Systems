@@ -20,8 +20,10 @@ export default function HomePage() {
     tags: e.tags,
   }));
 
+  // ランドマーク整理: header(banner) / main / footer(contentinfo) を .wrap 直下の
+  // 兄弟に配置する。header/footer を main の子孫に置くとランドマーク扱いされないため。
   return (
-    <main className="wrap">
+    <div className="wrap">
       <header className="site-header">
         <h1>GoDD Design-Systems</h1>
         <p>
@@ -30,9 +32,11 @@ export default function HomePage() {
         </p>
       </header>
 
-      <CatalogExplorer cells={cells} />
+      <main id="main-content" tabIndex={-1}>
+        <CatalogExplorer cells={cells} />
+      </main>
 
       <SiteFooter generatedAt={index.generatedAt} />
-    </main>
+    </div>
   );
 }

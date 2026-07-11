@@ -6,6 +6,9 @@
   --border: #e4e6eb;
   --card: #fafbfc;
   --accent: #2f5bea;
+  /* アクセント面 (選択チップ等) に載せる文字色。テーマで反転して AA を確保する。
+     light: 濃いアクセント上に白 (5.5:1) / dark: 明るいアクセント上に暗色 (6.3:1)。 */
+  --on-accent: #ffffff;
   --chip: #eef1f6;
   --radius: 12px;
   --maxw: 960px;
@@ -19,6 +22,7 @@
     --border: #23262d;
     --card: #15181d;
     --accent: #6f8dff;
+    --on-accent: #0e1013;
     --chip: #1c2027;
   }
 }
@@ -151,12 +155,14 @@ a:hover {
 
 .chip-btn.is-selected {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   border-color: var(--accent);
 }
 
 .chip-btn.is-selected .count {
-  color: rgba(255, 255, 255, 0.82);
+  /* アクセント面では半透明にするとコントラストが AA を割る (light 4.2 / dark 2.5)。
+     テーマ反転色を不透明で用いて 5.5:1 以上を確保する。 */
+  color: var(--on-accent);
 }
 
 .chip-btn:disabled {
@@ -164,13 +170,57 @@ a:hover {
   cursor: not-allowed;
 }
 
-/* キーボード操作時のフォーカスを明示 (a11y)。 */
-.chip-btn:focus-visible,
-.search-input:focus-visible,
-.clear-btn:focus-visible,
-.card:focus-visible {
+/* キーボード操作時のフォーカスを全インタラクティブ要素で明示 (a11y)。
+   フォーカスリングは 3:1 以上 (light 5.5:1 / dark 6.3:1) で WCAG 2.4.11 を満たす。 */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* スキップリンク: 通常は画面外、キーボードフォーカスで先頭に出現する。 */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -3.5rem;
+  z-index: 100;
+  background: var(--bg);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+  top: 0.75rem;
+  text-decoration: none;
+}
+
+/* スキップリンク着地点。プログラム的フォーカスでリング表示はしない。 */
+#main-content:focus,
+#main-content:focus-visible {
+  outline: none;
+}
+
+/* モーション過敏への配慮 (WCAG 2.3.3 / prefers-reduced-motion)。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card:hover {
+    transform: none;
+  }
 }
 
 /* --- 検索 / 絞り込みツールバー --- */
