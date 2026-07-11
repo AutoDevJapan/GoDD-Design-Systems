@@ -6,10 +6,20 @@
       "family": "achromatic",
       "family_ja": "無彩色系"
     },
+    "ac-ltgy": {
+      "name_ja": "明るい灰",
+      "family": "achromatic",
+      "family_ja": "無彩色系"
+    },
     "ac-w": {
       "name_ja": "白",
       "family": "achromatic",
       "family_ja": "無彩色系"
+    },
+    "b-h01": {
+      "name_ja": "ブライトトーンの赤紫みの赤",
+      "family": "red",
+      "family_ja": "赤系"
     },
     "b-h03": {
       "name_ja": "ブライトトーンの黄みの赤",
@@ -36,6 +46,11 @@
       "family": "yellow",
       "family_ja": "黄系"
     },
+    "b-h09": {
+      "name_ja": "ブライトトーンの緑みの黄",
+      "family": "yellow",
+      "family_ja": "黄系"
+    },
     "b-h12": {
       "name_ja": "ブライトトーンの緑",
       "family": "green",
@@ -45,6 +60,16 @@
       "name_ja": "ブライトトーンの青みの緑",
       "family": "green",
       "family_ja": "緑系"
+    },
+    "b-h14": {
+      "name_ja": "ブライトトーンの青緑",
+      "family": "blue",
+      "family_ja": "青系"
+    },
+    "b-h15": {
+      "name_ja": "ブライトトーンの青緑",
+      "family": "blue",
+      "family_ja": "青系"
     },
     "b-h16": {
       "name_ja": "ブライトトーンの緑みの青",
@@ -66,6 +91,11 @@
       "family": "purple",
       "family_ja": "紫系"
     },
+    "b-h21": {
+      "name_ja": "ブライトトーンの青みの紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
     "b-h23": {
       "name_ja": "ブライトトーンの赤みの紫",
       "family": "purple",
@@ -78,6 +108,11 @@
     },
     "d-h01": {
       "name_ja": "ダルトーンの赤紫みの赤",
+      "family": "red",
+      "family_ja": "赤系"
+    },
+    "d-h02": {
+      "name_ja": "ダルトーンの赤",
       "family": "red",
       "family_ja": "赤系"
     },
@@ -116,6 +151,11 @@
       "family": "green",
       "family_ja": "緑系"
     },
+    "d-h13": {
+      "name_ja": "ダルトーンの青みの緑",
+      "family": "green",
+      "family_ja": "緑系"
+    },
     "d-h15": {
       "name_ja": "ダルトーンの青緑",
       "family": "blue",
@@ -123,6 +163,11 @@
     },
     "d-h16": {
       "name_ja": "ダルトーンの緑みの青",
+      "family": "blue",
+      "family_ja": "青系"
+    },
+    "d-h17": {
+      "name_ja": "ダルトーンの青",
       "family": "blue",
       "family_ja": "青系"
     },
@@ -138,6 +183,11 @@
     },
     "d-h21": {
       "name_ja": "ダルトーンの青みの紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
+    "d-h22": {
+      "name_ja": "ダルトーンの紫",
       "family": "purple",
       "family_ja": "紫系"
     },
@@ -176,6 +226,11 @@
       "family": "yellow",
       "family_ja": "黄系"
     },
+    "dk-h09": {
+      "name_ja": "ダークトーンの緑みの黄",
+      "family": "yellow",
+      "family_ja": "黄系"
+    },
     "dk-h10": {
       "name_ja": "ダークトーンの黄緑",
       "family": "green",
@@ -190,6 +245,11 @@
       "name_ja": "ダークトーンの緑",
       "family": "green",
       "family_ja": "緑系"
+    },
+    "dk-h14": {
+      "name_ja": "ダークトーンの青緑",
+      "family": "blue",
+      "family_ja": "青系"
     },
     "dk-h15": {
       "name_ja": "ダークトーンの青緑",
@@ -228,6 +288,16 @@
     },
     "dk-h22": {
       "name_ja": "ダークトーンの紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
+    "dk-h23": {
+      "name_ja": "ダークトーンの赤みの紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
+    "dk-h24": {
+      "name_ja": "ダークトーンの赤紫",
       "family": "purple",
       "family_ja": "紫系"
     },
@@ -270,6 +340,11 @@
       "name_ja": "ダークグレイッシュトーンの緑みの黄",
       "family": "yellow",
       "family_ja": "黄系"
+    },
+    "dkg-h10": {
+      "name_ja": "ダークグレイッシュトーンの黄緑",
+      "family": "green",
+      "family_ja": "緑系"
     },
     "dkg-h11": {
       "name_ja": "ダークグレイッシュトーンの黄みの緑",
@@ -316,6 +391,11 @@
       "family": "purple",
       "family_ja": "紫系"
     },
+    "dkg-h21": {
+      "name_ja": "ダークグレイッシュトーンの青みの紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
     "dkg-h23": {
       "name_ja": "ダークグレイッシュトーンの赤みの紫",
       "family": "purple",
@@ -351,6 +431,11 @@
       "family": "yellow",
       "family_ja": "黄系"
     },
+    "dp-h08": {
+      "name_ja": "ディープトーンの黄",
+      "family": "yellow",
+      "family_ja": "黄系"
+    },
     "dp-h09": {
       "name_ja": "ディープトーンの緑みの黄",
       "family": "yellow",
@@ -381,8 +466,18 @@
       "family": "blue",
       "family_ja": "青系"
     },
+    "dp-h17": {
+      "name_ja": "ディープトーンの青",
+      "family": "blue",
+      "family_ja": "青系"
+    },
     "dp-h20": {
       "name_ja": "ディープトーンの青紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
+    "dp-h23": {
+      "name_ja": "ディープトーンの赤みの紫",
       "family": "purple",
       "family_ja": "紫系"
     },
@@ -390,6 +485,16 @@
       "name_ja": "ディープトーンの赤紫",
       "family": "purple",
       "family_ja": "紫系"
+    },
+    "g-h01": {
+      "name_ja": "グレイッシュトーンの赤紫みの赤",
+      "family": "red",
+      "family_ja": "赤系"
+    },
+    "g-h02": {
+      "name_ja": "グレイッシュトーンの赤",
+      "family": "red",
+      "family_ja": "赤系"
     },
     "g-h03": {
       "name_ja": "グレイッシュトーンの黄みの赤",
@@ -413,6 +518,11 @@
     },
     "g-h08": {
       "name_ja": "グレイッシュトーンの黄",
+      "family": "yellow",
+      "family_ja": "黄系"
+    },
+    "g-h09": {
+      "name_ja": "グレイッシュトーンの緑みの黄",
       "family": "yellow",
       "family_ja": "黄系"
     },
@@ -456,6 +566,11 @@
       "family": "blue",
       "family_ja": "青系"
     },
+    "g-h20": {
+      "name_ja": "グレイッシュトーンの青紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
     "g-h21": {
       "name_ja": "グレイッシュトーンの青みの紫",
       "family": "purple",
@@ -463,6 +578,11 @@
     },
     "g-h23": {
       "name_ja": "グレイッシュトーンの赤みの紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
+    "g-h24": {
+      "name_ja": "グレイッシュトーンの赤紫",
       "family": "purple",
       "family_ja": "紫系"
     },
@@ -501,6 +621,11 @@
       "family": "orange",
       "family_ja": "橙系"
     },
+    "lt-h05": {
+      "name_ja": "ライトトーンのオレンジ",
+      "family": "orange",
+      "family_ja": "橙系"
+    },
     "lt-h06": {
       "name_ja": "ライトトーンの黄みのオレンジ",
       "family": "orange",
@@ -531,6 +656,11 @@
       "family": "blue",
       "family_ja": "青系"
     },
+    "lt-h15": {
+      "name_ja": "ライトトーンの青緑",
+      "family": "blue",
+      "family_ja": "青系"
+    },
     "lt-h17": {
       "name_ja": "ライトトーンの青",
       "family": "blue",
@@ -551,10 +681,25 @@
       "family": "purple",
       "family_ja": "紫系"
     },
+    "lt-h22": {
+      "name_ja": "ライトトーンの紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
+    "lt-h23": {
+      "name_ja": "ライトトーンの赤みの紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
     "lt-h24": {
       "name_ja": "ライトトーンの赤紫",
       "family": "purple",
       "family_ja": "紫系"
+    },
+    "ltg-h01": {
+      "name_ja": "ライトグレイッシュトーンの赤紫みの赤",
+      "family": "red",
+      "family_ja": "赤系"
     },
     "ltg-h03": {
       "name_ja": "ライトグレイッシュトーンの黄みの赤",
@@ -571,7 +716,32 @@
       "family": "yellow",
       "family_ja": "黄系"
     },
+    "ltg-h08": {
+      "name_ja": "ライトグレイッシュトーンの黄",
+      "family": "yellow",
+      "family_ja": "黄系"
+    },
+    "ltg-h10": {
+      "name_ja": "ライトグレイッシュトーンの黄緑",
+      "family": "green",
+      "family_ja": "緑系"
+    },
+    "ltg-h12": {
+      "name_ja": "ライトグレイッシュトーンの緑",
+      "family": "green",
+      "family_ja": "緑系"
+    },
+    "ltg-h13": {
+      "name_ja": "ライトグレイッシュトーンの青みの緑",
+      "family": "green",
+      "family_ja": "緑系"
+    },
     "ltg-h14": {
+      "name_ja": "ライトグレイッシュトーンの青緑",
+      "family": "blue",
+      "family_ja": "青系"
+    },
+    "ltg-h15": {
       "name_ja": "ライトグレイッシュトーンの青緑",
       "family": "blue",
       "family_ja": "青系"
@@ -631,8 +801,23 @@
       "family": "orange",
       "family_ja": "橙系"
     },
+    "p-h06": {
+      "name_ja": "ペールトーンの黄みのオレンジ",
+      "family": "orange",
+      "family_ja": "橙系"
+    },
     "p-h07": {
       "name_ja": "ペールトーンの赤みの黄",
+      "family": "yellow",
+      "family_ja": "黄系"
+    },
+    "p-h08": {
+      "name_ja": "ペールトーンの黄",
+      "family": "yellow",
+      "family_ja": "黄系"
+    },
+    "p-h09": {
+      "name_ja": "ペールトーンの緑みの黄",
       "family": "yellow",
       "family_ja": "黄系"
     },
@@ -656,8 +841,28 @@
       "family": "green",
       "family_ja": "緑系"
     },
+    "p-h14": {
+      "name_ja": "ペールトーンの青緑",
+      "family": "blue",
+      "family_ja": "青系"
+    },
+    "p-h15": {
+      "name_ja": "ペールトーンの青緑",
+      "family": "blue",
+      "family_ja": "青系"
+    },
     "p-h16": {
       "name_ja": "ペールトーンの緑みの青",
+      "family": "blue",
+      "family_ja": "青系"
+    },
+    "p-h17": {
+      "name_ja": "ペールトーンの青",
+      "family": "blue",
+      "family_ja": "青系"
+    },
+    "p-h19": {
+      "name_ja": "ペールトーンの紫みの青",
       "family": "blue",
       "family_ja": "青系"
     },
@@ -701,15 +906,35 @@
       "family": "orange",
       "family_ja": "橙系"
     },
+    "s-h05": {
+      "name_ja": "ストロングトーンのオレンジ",
+      "family": "orange",
+      "family_ja": "橙系"
+    },
     "s-h06": {
       "name_ja": "ストロングトーンの黄みのオレンジ",
       "family": "orange",
       "family_ja": "橙系"
     },
+    "s-h07": {
+      "name_ja": "ストロングトーンの赤みの黄",
+      "family": "yellow",
+      "family_ja": "黄系"
+    },
     "s-h08": {
       "name_ja": "ストロングトーンの黄",
       "family": "yellow",
       "family_ja": "黄系"
+    },
+    "s-h10": {
+      "name_ja": "ストロングトーンの黄緑",
+      "family": "green",
+      "family_ja": "緑系"
+    },
+    "s-h11": {
+      "name_ja": "ストロングトーンの黄みの緑",
+      "family": "green",
+      "family_ja": "緑系"
     },
     "s-h13": {
       "name_ja": "ストロングトーンの青みの緑",
@@ -743,6 +968,11 @@
     },
     "s-h20": {
       "name_ja": "ストロングトーンの青紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
+    "s-h21": {
+      "name_ja": "ストロングトーンの青みの紫",
       "family": "purple",
       "family_ja": "紫系"
     },
@@ -816,6 +1046,11 @@
       "family": "blue",
       "family_ja": "青系"
     },
+    "sf-h16": {
+      "name_ja": "ソフトトーンの緑みの青",
+      "family": "blue",
+      "family_ja": "青系"
+    },
     "sf-h17": {
       "name_ja": "ソフトトーンの青",
       "family": "blue",
@@ -861,6 +1096,11 @@
       "family": "red",
       "family_ja": "赤系"
     },
+    "v-h02": {
+      "name_ja": "ビビッドトーンの赤",
+      "family": "red",
+      "family_ja": "赤系"
+    },
     "v-h03": {
       "name_ja": "ビビッドトーンの黄みの赤",
       "family": "red",
@@ -880,6 +1120,11 @@
       "name_ja": "ビビッドトーンの黄みのオレンジ",
       "family": "orange",
       "family_ja": "橙系"
+    },
+    "v-h07": {
+      "name_ja": "ビビッドトーンの赤みの黄",
+      "family": "yellow",
+      "family_ja": "黄系"
     },
     "v-h10": {
       "name_ja": "ビビッドトーンの黄緑",
@@ -911,6 +1156,11 @@
       "family": "blue",
       "family_ja": "青系"
     },
+    "v-h18": {
+      "name_ja": "ビビッドトーンの青",
+      "family": "blue",
+      "family_ja": "青系"
+    },
     "v-h19": {
       "name_ja": "ビビッドトーンの紫みの青",
       "family": "blue",
@@ -923,6 +1173,11 @@
     },
     "v-h22": {
       "name_ja": "ビビッドトーンの紫",
+      "family": "purple",
+      "family_ja": "紫系"
+    },
+    "v-h23": {
+      "name_ja": "ビビッドトーンの赤みの紫",
       "family": "purple",
       "family_ja": "紫系"
     },
