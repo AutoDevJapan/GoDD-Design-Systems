@@ -15,7 +15,8 @@
     "build": "next build",
     "start": "next start",
     "validate:index": "node scripts/validate-index.mjs",
-    "validate": "pnpm run validate:index"
+    "validate:design-md": "node scripts/validate-design-md.mjs",
+    "validate": "pnpm run validate:index && pnpm run validate:design-md"
   },
   "dependencies": {
     "next": "^15.5.7",

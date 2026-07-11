@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/AutoDevJapan/GoDD-Design-Systems/main/documents/schema/design-md.schema.json",
+  "title": "GoDD Design-Systems DESIGN.md frontmatter",
+  "description": "各セル (design-md/{jsic}/{color}/{mood}/DESIGN.md) 冒頭の frontmatter (--- で囲む flat な key: value 群) を検証する。SSOT §3 の meta セクションに対応。本文 9 セクションの構造 (H2 見出し順序) は scripts/validate-design-md.mjs が別途検証する。全体仕様は documents/schema/design-md.schema.md を参照。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "jsic", "color", "mood", "schemaVersion", "generatedAt"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9]{4}_[a-z0-9]+(-[a-z0-9]+)*_[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "セルの安定 ID。形式 `{jsic}_{color}_{mood}`。index.json の entry.id と一致する。"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "人間可読の見出し。index.json の entry.title と一致する。"
+    },
+    "jsic": {
+      "type": "string",
+      "pattern": "^[0-9]{4}$",
+      "description": "JSIC 細分類コード (4桁)。出典 jsic.json (Issue #3)。"
+    },
+    "color": {
+      "$ref": "#/$defs/slug",
+      "description": "カラー軸の slug。taxonomy.md §1 の語彙。"
+    },
+    "mood": {
+      "$ref": "#/$defs/slug",
+      "description": "ムード軸の slug。taxonomy.md §2 の語彙。"
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/slug" },
+      "description": "任意。タイポ体系・レイアウト原型など軸に掛けない検索用タグ。index.json の entry.tags と一致する。"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "DESIGN.md 形式のメジャーバージョン。破壊的変更時に increment する。"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "材化 (初回生成) 時刻。ISO 8601 / RFC 3339。"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "任意。再材化/更新時刻。ISO 8601 / RFC 3339。"
+    },
+    "license": {
+      "type": "string",
+      "description": "任意。このセルのライセンス識別子 (SPDX)。既定はリポジトリの MIT。",
+      "default": "MIT"
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "taxonomy.md §0 の slug 規則。小文字英数字とハイフンのみ、先頭/末尾/連続ハイフン禁止。"
+    }
+  }
+}

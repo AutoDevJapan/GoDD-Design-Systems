@@ -27,7 +27,9 @@ jobs:
       - name: 依存インストール
         run: pnpm install --frozen-lockfile
       - name: index.json をスキーマ検証
-        run: pnpm run validate
+        run: pnpm run validate:index
+      - name: DESIGN.md をスキーマ + 構造検証
+        run: pnpm run validate:design-md
 
   secrets-scan:
     name: gitleaks (機密検出)
