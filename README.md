@@ -21,6 +21,8 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | `scripts/validate-design-md.mjs` | `DESIGN.md` を frontmatter + セクション構造 + index 整合検証 (CI) |
 | `scripts/validate-jsic.mjs` | `jsic.json` をスキーマ + 親子整合 + `index.json` 相互検証 (CI) |
 | `scripts/build-jsic.mjs` | `jsic.json` の取込/整列/件数再計算パイプライン (再現可能) |
+| `scripts/legal-check.mjs` | de-brand / オープン書体 / 出典表示を検証する法務チェック (CI, SSOT §8) |
+| `LICENSE` / `NOTICE` | MIT ライセンス本文 / 第三者データ・書体の出典と帰属表示 |
 | `app/`, `lib/`, `next.config.mjs` | 公開ブラウズ用の静的サイト (Next.js App Router / SSG) |
 
 ## 開発
@@ -31,7 +33,8 @@ Node.js >= 22 / pnpm >= 10。
 pnpm install
 pnpm dev        # サイトをローカル起動 (http://localhost:3000)
 pnpm build      # 静的サイトを out/ へ書き出し (next build, output: export)
-pnpm validate   # index.json と DESIGN.md を検証 (CI と同一)
+pnpm validate   # index.json / DESIGN.md / jsic.json + 法務チェックを検証 (CI と同一)
+pnpm legal:check # de-brand / オープン書体 / 出典表示のみを個別に検証
 ```
 
 サイトのトップページは `index.json` と `taxonomy.md` の分類軸をもとに、
@@ -70,10 +73,16 @@ GitHub Actions Secrets で管理し、リポジトリにはコミットしない
 - 出典: 総務省 政策統括官（統計制度担当）/ e-Stat 政府統計の総合窓口。
   一次資料 URL は `jsic.json` の `meta.source.urls` を参照。
 
-## 出典 / 法務
+## ライセンス / 出典 / 法務
 
-- カラー軸: PCCS (日本色研配色体系) 24 色相 × トーン + JIS 無彩色。
+- ライセンス: MIT (`LICENSE`)。第三者データ・書体の出典と帰属は `NOTICE` に明記する。
+- カラー軸: PCCS (日本色研配色体系) 24 色相 × トーン + JIS 無彩色を参考にした一般化語彙。
+  商用色票・数値データそのものは再配布しない。
 - 業種軸: 日本標準産業分類 (JSIC) 第14回改定 (令和5年7月告示)。出典 総務省 / e-Stat。
   分類コード・名称は公的分類 (政府標準利用規約準拠)。詳細は `jsic.json` の `meta.source`。
-- 特定製品・ブランドの色名 / 書体は用いない。UI は `system-ui` 系のオープンな
-  フォントスタックのみを使用する。
+- 書体: SIL OFL 等のオープンライセンス書体名のみを参照 (バイナリは同梱しない)。
+  商標書体名は使用しない。
+- de-brand: 特定企業のブランド名・ロゴ・トレードドレス・商標書体名を含めない。
+  この方針 (SSOT §8 法務チェックリスト) は `scripts/legal-check.mjs` により CI で
+  機械検証する (`schema 検証` ジョブに統合)。良質な既存サイトは着想元に留め、
+  出力は一般化されたオリジナルとする。

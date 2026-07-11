@@ -17,8 +17,9 @@
     "validate:index": "node scripts/validate-index.mjs",
     "validate:design-md": "node scripts/validate-design-md.mjs",
     "validate:jsic": "node scripts/validate-jsic.mjs",
+    "legal:check": "node scripts/legal-check.mjs",
     "build:jsic": "node scripts/build-jsic.mjs",
-    "validate": "pnpm run validate:index && pnpm run validate:design-md && pnpm run validate:jsic"
+    "validate": "pnpm run validate:index && pnpm run validate:design-md && pnpm run validate:jsic && pnpm run legal:check"
   },
   "dependencies": {
     "marked": "^18.0.6",
