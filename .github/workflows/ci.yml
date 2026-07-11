@@ -18,7 +18,7 @@ jobs:
     name: schema 検証 (index.json)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
@@ -32,7 +32,7 @@ jobs:
     name: gitleaks (機密検出)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: gitleaks インストール
         env:
           GITLEAKS_VERSION: "8.30.1"
