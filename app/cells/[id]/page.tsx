@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { loadDesignDoc, loadIndex, type Entry } from "@/lib/catalog";
+import { loadDesignSections, loadIndex, type Entry } from "@/lib/catalog";
 import { SiteFooter } from "@/app/_components/site-footer";
 
 /** 静的エクスポート: index.json の全 id をビルド時に列挙する。 */
@@ -36,7 +36,7 @@ export default async function CellPage({
   if (!entry) notFound();
 
   const index = loadIndex();
-  const design = loadDesignDoc(entry.path);
+  const sections = loadDesignSections(entry.path);
 
   return (
     <main className="wrap detail">
@@ -71,12 +71,12 @@ export default async function CellPage({
         <dd>{entry.createdAt}</dd>
       </dl>
 
-      {design ? (
+      {sections ? (
         <section className="design" aria-labelledby="design-heading">
           <h2 id="design-heading" className="design-title">
             DESIGN.md 本文
           </h2>
-          {design.sections.map((s) => (
+          {sections.map((s) => (
             <article className="design-section" key={s.id} id={s.id}>
               <h3>
                 {s.ja} <span className="section-id">/ {s.id}</span>

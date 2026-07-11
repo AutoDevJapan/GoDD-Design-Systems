@@ -72,46 +72,17 @@ export type DesignSection = {
   html: string;
 };
 
-/** 1 セルの DESIGN.md をパースした結果。 */
-export type DesignDoc = {
-  /** frontmatter の flat な key/value（配列はインライン）。 */
-  frontmatter: Record<string, string | number | string[]>;
-  /** H1 見出しのタイトル。 */
-  title: string;
-  /** 本文 9 セクション（ファイル出現順）。 */
-  sections: DesignSection[];
-};
-
-/** frontmatter の値: インライン配列 `[a, b]` かスカラ（数値/クォート文字列/裸文字列）。 */
-function parseFrontmatterValue(raw: string): string | number | string[] {
-  if (raw.startsWith("[") && raw.endsWith("]")) {
-    const inner = raw.slice(1, -1).trim();
-    if (inner === "") return [];
-    return inner.split(",").map((s) => stripQuotes(s.trim()));
-  }
-  if (/^-?[0-9]+$/.test(raw)) return Number(raw);
-  return stripQuotes(raw);
-}
-
-function stripQuotes(s: string): string {
-  if (
-    s.length >= 2 &&
-    ((s[0] === '"' && s.at(-1) === '"') || (s[0] === "'" && s.at(-1) === "'"))
-  ) {
-    return s.slice(1, -1);
-  }
-  return s;
-}
-
 /**
- * `entry.path`（design-md/.../DESIGN.md）の本文を読み、frontmatter・H1・
- * 本文 9 セクションへ分解して返す。検証済みのオンディスク形式
- * (documents/schema/design-md.schema.md) に準拠してパースする。
+ * `entry.path`（design-md/.../DESIGN.md）の本文を読み、本文 9 セクション
+ * (`## {ja} / {id}`) へ分解して整形済み HTML を返す。検証済みのオンディスク
+ * 形式 (documents/schema/design-md.schema.md) に準拠してパースする。
+ * frontmatter 由来のメタ（id/軸/tags 等）は index.json エントリ側で表示する
+ * ため、本ローダは本文セクションのみを返す。
  *
- * 材化されていない（ファイル不在）セルは `null` を返す。呼び出し側は
+ * 材化されていない（ファイル不在/本文なし）セルは `null` を返す。呼び出し側は
  * 現状のメタ表示にフォールバックする。ビルド時 (SSG) にのみ呼ばれる。
  */
-export function loadDesignDoc(path: string): DesignDoc | null {
+export function loadDesignSections(path: string): DesignSection[] | null {
   const full = join(repoRoot, path);
   if (!existsSync(full)) return null;
 
@@ -119,6 +90,7 @@ export function loadDesignDoc(path: string): DesignDoc | null {
   const lines = src.split("\n");
   if (lines[0] !== "---") return null;
 
+  // frontmatter (先頭 `---` 〜 次の `---`) をスキップして本文を得る。
   let fmEnd = -1;
   for (let i = 1; i < lines.length; i++) {
     if (lines[i] === "---") {
@@ -127,29 +99,14 @@ export function loadDesignDoc(path: string): DesignDoc | null {
     }
   }
   if (fmEnd === -1) return null;
-
-  const frontmatter: Record<string, string | number | string[]> = {};
-  for (let i = 1; i < fmEnd; i++) {
-    const line = lines[i];
-    if (line.trim() === "") continue;
-    const m = /^([A-Za-z][A-Za-z0-9]*):\s*(.*)$/.exec(line);
-    if (m) frontmatter[m[1]] = parseFrontmatterValue(m[2].trim());
-  }
-
   const body = lines.slice(fmEnd + 1);
 
-  // H1 タイトルと H2 見出し（コードフェンス内は除外）を収集する。
-  let title = typeof frontmatter.title === "string" ? frontmatter.title : "";
+  // H2 見出し（コードフェンス内は除外）を収集する。
   const headings: { ja: string; id: string; line: number }[] = [];
   let inFence = false;
   body.forEach((line, i) => {
     if (/^```/.test(line.trim())) inFence = !inFence;
     if (inFence) return;
-    const h1 = /^#\s+(.*\S)\s*$/.exec(line);
-    if (h1) {
-      title = h1[1].trim();
-      return;
-    }
     const h2 = /^##\s+(.*\S)\s*$/.exec(line);
     if (h2) {
       const text = h2[1].trim();
@@ -169,7 +126,5 @@ export function loadDesignDoc(path: string): DesignDoc | null {
     return { id: h.id, ja: h.ja, html };
   });
 
-  if (sections.length === 0) return null;
-
-  return { frontmatter, title, sections };
+  return sections.length > 0 ? sections : null;
 }
