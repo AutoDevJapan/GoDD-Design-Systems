@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/AutoDevJapan/GoDD-Design-Systems/main/documents/schema/jsic.schema.json",
+  "title": "GoDD Design-Systems jsic.json",
+  "description": "日本標準産業分類 (JSIC / 第14回改定・令和5年7月告示) の code→名称→定義。業種軸 (design-md/{jsic}/...) の選定用 SSOT。出典: 総務省 / e-Stat。SSOT §2, §8 準拠。大分類・中分類は全件、小分類・細分類は代表項目のシード (meta.completeness 参照)。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "major", "middle", "minor", "subclass"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "任意。本ファイルを検証する JSON Schema への参照 (エディタ補完用)。"
+    },
+    "meta": { "$ref": "#/$defs/meta" },
+    "major": {
+      "type": "array",
+      "description": "大分類 (20)。英字 1 文字 A〜T。",
+      "items": { "$ref": "#/$defs/major" }
+    },
+    "middle": {
+      "type": "array",
+      "description": "中分類 (99)。2 桁数字。major を親に持つ。",
+      "items": { "$ref": "#/$defs/middle" }
+    },
+    "minor": {
+      "type": "array",
+      "description": "小分類。3 桁数字。middle を親に持つ。代表項目のシード。",
+      "items": { "$ref": "#/$defs/minor" }
+    },
+    "subclass": {
+      "type": "array",
+      "description": "細分類。4 桁数字。minor を親に持つ。index.json の jsic 値はここに存在する必要がある。代表項目のシード。",
+      "items": { "$ref": "#/$defs/subclass" }
+    }
+  },
+  "$defs": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "revision", "source", "official", "ingested", "completeness"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "description": "分類名 (日本標準産業分類 / Japan Standard Industrial Classification)。"
+        },
+        "revision": {
+          "type": "string",
+          "description": "改定回・告示 (例: 第14回改定 / 令和5年7月告示)。"
+        },
+        "revisionCode": {
+          "type": "string",
+          "description": "e-Stat 上の改定コード (令和5年改定 = \"04\")。"
+        },
+        "promulgated": {
+          "type": "string",
+          "description": "告示日 (ISO 8601 date)。"
+        },
+        "effective": {
+          "type": "string",
+          "description": "適用開始日 (ISO 8601 date)。"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "urls"],
+          "properties": {
+            "name": { "type": "string", "description": "出典元 (総務省 / e-Stat)。" },
+            "urls": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "format": "uri" },
+              "description": "一次資料 URL。"
+            },
+            "note": { "type": "string", "description": "利用条件・注記。" }
+          }
+        },
+        "official": {
+          "$ref": "#/$defs/counts",
+          "description": "官報上の公式項目数 (大20/中99/小536/細1473)。"
+        },
+        "ingested": {
+          "$ref": "#/$defs/counts",
+          "description": "本ファイルに実際に収録した項目数。official 未満なら未完 (completeness=partial)。"
+        },
+        "completeness": {
+          "type": "string",
+          "enum": ["full", "partial"],
+          "description": "収録状況。細分類全1,473件収録で full、シードは partial。"
+        },
+        "note": {
+          "type": "string",
+          "description": "収録方針・未収録の明示 (loud disclosure)。"
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["major", "middle", "minor", "subclass"],
+      "properties": {
+        "major": { "type": "integer", "minimum": 0 },
+        "middle": { "type": "integer", "minimum": 0 },
+        "minor": { "type": "integer", "minimum": 0 },
+        "subclass": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "majorCode": {
+      "type": "string",
+      "pattern": "^[A-T]$",
+      "description": "大分類コード。英字 1 文字 A〜T。"
+    },
+    "major": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "name"],
+      "properties": {
+        "code": { "$ref": "#/$defs/majorCode" },
+        "name": { "type": "string", "minLength": 1 }
+      }
+    },
+    "middle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "name", "major"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[0-9]{2}$" },
+        "name": { "type": "string", "minLength": 1 },
+        "major": { "$ref": "#/$defs/majorCode" }
+      }
+    },
+    "minor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "name", "middle", "major"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[0-9]{3}$" },
+        "name": { "type": "string", "minLength": 1 },
+        "middle": { "type": "string", "pattern": "^[0-9]{2}$" },
+        "major": { "$ref": "#/$defs/majorCode" },
+        "definition": { "type": "string" }
+      }
+    },
+    "subclass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "name", "minor", "middle", "major"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[0-9]{4}$" },
+        "name": { "type": "string", "minLength": 1 },
+        "minor": { "type": "string", "pattern": "^[0-9]{3}$" },
+        "middle": { "type": "string", "pattern": "^[0-9]{2}$" },
+        "major": { "$ref": "#/$defs/majorCode" },
+        "definition": { "type": "string" }
+      }
+    }
+  }
+}

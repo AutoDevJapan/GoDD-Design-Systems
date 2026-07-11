@@ -1,7 +1,7 @@
 ---
-id: 7412_h17b-lt_trustworthy
+id: 7281_h17b-lt_trustworthy
 title: "経営コンサルタント業 × ライトブルー × 信頼"
-jsic: "7412"
+jsic: "7281"
 color: h17b-lt
 mood: trustworthy
 tags: [professional, geometric-grid, sans-serif]

@@ -4,26 +4,28 @@
   "generatedAt": "2026-07-11T00:00:00Z",
   "entries": [
     {
-      "id": "7412_h17b-lt_trustworthy",
-      "path": "design-md/7412/h17b-lt/trustworthy/DESIGN.md",
-      "jsic": "7412",
+      "id": "7281_h17b-lt_trustworthy",
+      "path": "design-md/7281/h17b-lt/trustworthy/DESIGN.md",
+      "jsic": "7281",
       "color": "h17b-lt",
       "mood": "trustworthy",
       "tags": ["professional", "geometric-grid", "sans-serif"],
       "title": "経営コンサルタント業 × ライトブルー × 信頼",
-      "hash": "sha256:269d98613cfa2dd1ff6b8a8926aa86ea34dc09b4026ed31fda03c40e7bc5ac89",
-      "createdAt": "2026-07-11T00:00:00Z"
+      "hash": "sha256:34e0fa4ea4c99c813ef60c58addae682cd03e39d5484d14137863279cd4bfda2",
+      "createdAt": "2026-07-11T00:00:00Z",
+      "updatedAt": "2026-07-11T00:00:00Z"
     },
     {
-      "id": "5910_white_minimal",
-      "path": "design-md/5910/white/minimal/DESIGN.md",
-      "jsic": "5910",
+      "id": "6061_white_minimal",
+      "path": "design-md/6061/white/minimal/DESIGN.md",
+      "jsic": "6061",
       "color": "white",
       "mood": "minimal",
       "tags": ["editorial", "serif-display"],
       "title": "書籍・雑誌小売業 × ホワイト × ミニマル",
-      "hash": "sha256:caad96edbc436904a3b520553d14062e8c5261dd7dee548d8b8a92b1b18bbd04",
-      "createdAt": "2026-07-11T00:00:00Z"
+      "hash": "sha256:da3256c12d6b53150ff4adee0b3a8dea06d6fbb9aac22e5d36d8cfc5686b31b0",
+      "createdAt": "2026-07-11T00:00:00Z",
+      "updatedAt": "2026-07-11T00:00:00Z"
     }
   ]
 }
