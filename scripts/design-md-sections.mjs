@@ -1,7 +1,7 @@
 // DESIGN.md の正規セクション定義（オンディスク Markdown 形式の単一情報源）。
 //
-// Generator (private) の 10 セクションスキーマ（src/schema/sections.ts の
-// DESIGN_SECTIONS）と整合する。Generator は「meta + 9 コンテンツ」を構造化
+// Generator (private) の 10 セクションスキーマと整合する（セクション id・出現順を一致
+// させる）。Generator は「meta + 9 コンテンツ」を構造化
 // ドキュメントとして持つが、本公開リポジトリでは:
 //   - meta セクション  → DESIGN.md 冒頭の frontmatter（--- で囲む）に対応。
 //   - 9 コンテンツ     → 本文の H2 見出しセクションに対応（順序固定）。
