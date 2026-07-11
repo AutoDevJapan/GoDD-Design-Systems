@@ -1,2 +1,12 @@
 node_modules/
 *.log
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Vercel CLI (local link / pulled env)
+.vercel/
+.env*.local
