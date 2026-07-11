@@ -30,6 +30,8 @@ jobs:
         run: pnpm run validate:index
       - name: DESIGN.md をスキーマ + 構造検証
         run: pnpm run validate:design-md
+      - name: jsic.json をスキーマ + 整合性 + index 相互検証
+        run: pnpm run validate:jsic
 
   secrets-scan:
     name: gitleaks (機密検出)

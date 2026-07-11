@@ -1,7 +1,7 @@
 ---
-id: 5910_white_minimal
+id: 6061_white_minimal
 title: "書籍・雑誌小売業 × ホワイト × ミニマル"
-jsic: "5910"
+jsic: "6061"
 color: white
 mood: minimal
 tags: [editorial, serif-display]

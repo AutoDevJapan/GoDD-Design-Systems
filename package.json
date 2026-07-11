@@ -16,7 +16,9 @@
     "start": "next start",
     "validate:index": "node scripts/validate-index.mjs",
     "validate:design-md": "node scripts/validate-design-md.mjs",
-    "validate": "pnpm run validate:index && pnpm run validate:design-md"
+    "validate:jsic": "node scripts/validate-jsic.mjs",
+    "build:jsic": "node scripts/build-jsic.mjs",
+    "validate": "pnpm run validate:index && pnpm run validate:design-md && pnpm run validate:jsic"
   },
   "dependencies": {
     "marked": "^18.0.6",
