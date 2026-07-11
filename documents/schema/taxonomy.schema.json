@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/AutoDevJapan/GoDD-Design-Systems/main/documents/schema/taxonomy.schema.json",
+  "title": "GoDD Design-Systems taxonomy.json",
+  "description": "color / mood slug の機械可読な日本語ラベル契約。taxonomy.md (SSOT) を出典とし、Matrix Pages が raw URL から実行時 fetch してファセットラベルを日本語化する。SSOT §2 準拠。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "colors", "moods"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "taxonomy.json 契約のメジャーバージョン。破壊的変更時に increment する。"
+    },
+    "colors": {
+      "type": "object",
+      "description": "color slug -> 日本語ラベル。キーは taxonomy.md §1 の color 語彙 (有彩色 {tone}-{hue} / 旧 {hue}-{tone} / 無彩色 slug)。",
+      "propertyNames": { "$ref": "#/$defs/slug" },
+      "additionalProperties": { "$ref": "#/$defs/colorEntry" },
+      "minProperties": 1
+    },
+    "moods": {
+      "type": "object",
+      "description": "mood slug -> 日本語ラベル。キーは taxonomy.md §2 の mood 語彙。",
+      "propertyNames": { "$ref": "#/$defs/slug" },
+      "additionalProperties": { "$ref": "#/$defs/moodEntry" },
+      "minProperties": 1
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "taxonomy.md §0 の slug 規則。小文字英数字とハイフンのみ、先頭/末尾/連続ハイフン禁止。"
+    },
+    "colorEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name_ja", "family", "family_ja"],
+      "properties": {
+        "name_ja": {
+          "type": "string",
+          "minLength": 1,
+          "description": "自然な日本語のカラー名 (例: ダルトーンの赤みの黄 / 白)。"
+        },
+        "family": {
+          "type": "string",
+          "enum": ["red", "orange", "yellow", "green", "blue", "purple", "achromatic"],
+          "description": "カラー系統 (family) の slug。"
+        },
+        "family_ja": {
+          "type": "string",
+          "pattern": "系$",
+          "description": "カラー系統の日本語名 (例: 赤系 / 無彩色系)。末尾は「系」。"
+        }
+      }
+    },
+    "moodEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name_ja", "axis"],
+      "properties": {
+        "name_ja": {
+          "type": "string",
+          "minLength": 1,
+          "description": "自然な日本語のムード名 (例: ブルータル / やさしい / 禅)。"
+        },
+        "axis": {
+          "type": "string",
+          "enum": ["energy", "温度", "格", "性格", "時代", "情緒"],
+          "description": "taxonomy.md §2 の 6 観点のいずれか。"
+        }
+      }
+    }
+  }
+}
