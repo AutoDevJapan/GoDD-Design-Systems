@@ -1,18 +1,24 @@
-import Link from "next/link";
-import { deriveFacets, loadIndex } from "@/lib/catalog";
+import { loadIndex } from "@/lib/catalog";
 import { SiteFooter } from "@/app/_components/site-footer";
-
-const AXIS_LABELS: { key: "jsic" | "color" | "mood" | "tag"; label: string }[] =
-  [
-    { key: "jsic", label: "業種 (JSIC)" },
-    { key: "color", label: "カラー" },
-    { key: "mood", label: "ムード" },
-    { key: "tag", label: "タグ" },
-  ];
+import {
+  CatalogExplorer,
+  type CatalogCell,
+} from "@/app/_components/catalog-explorer";
 
 export default function HomePage() {
   const index = loadIndex();
-  const facets = deriveFacets(index.entries);
+
+  // ビルド時に軽量インデックス（ブラウズに必要な最小情報）を埋め込み、
+  // クライアント側で絞り込み / 検索する。静的エクスポート (output: export)
+  // と両立し、全セルが初期 HTML に含まれるため SEO も損なわない。
+  const cells: CatalogCell[] = index.entries.map((e) => ({
+    id: e.id,
+    title: e.title,
+    jsic: e.jsic,
+    color: e.color,
+    mood: e.mood,
+    tags: e.tags,
+  }));
 
   return (
     <main className="wrap">
@@ -24,58 +30,7 @@ export default function HomePage() {
         </p>
       </header>
 
-      <section className="section" aria-labelledby="axes-heading">
-        <h2 id="axes-heading">分類軸</h2>
-        <p className="lead">
-          値集合の SSOT は{" "}
-          <a href="https://github.com/AutoDevJapan/GoDD-Design-Systems/blob/main/taxonomy.md">
-            taxonomy.md
-          </a>{" "}
-          で定義。以下は現在材化済みの {index.entries.length}{" "}
-          セルから導出したファセット。
-        </p>
-        <div className="facets">
-          {AXIS_LABELS.map(({ key, label }) => (
-            <div className="facet" key={key}>
-              <h3>{label}</h3>
-              <div className="chips">
-                {facets[key].map((f) => (
-                  <span className="chip" key={f.value}>
-                    {f.value}
-                    <span className="count">{f.count}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="section" aria-labelledby="cells-heading">
-        <h2 id="cells-heading">カタログ ({index.entries.length})</h2>
-        <p className="lead">
-          index.json のエントリ一覧。各セルは業種 × カラー ×
-          ムードの 1 つの DESIGN.md に対応する。
-        </p>
-        <div className="cards">
-          {index.entries.map((entry) => (
-            <Link
-              className="card"
-              key={entry.id}
-              href={`/cells/${entry.id}/`}
-            >
-              <p className="title">{entry.title}</p>
-              <div className="meta">
-                <span className="chip">{entry.jsic}</span>
-                <span className="chip">{entry.color}</span>
-                <span className="chip">{entry.mood}</span>
-              </div>
-              <div className="tags">{entry.tags.join(" · ")}</div>
-              <div className="id">{entry.id}</div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <CatalogExplorer cells={cells} />
 
       <SiteFooter generatedAt={index.generatedAt} />
     </main>
