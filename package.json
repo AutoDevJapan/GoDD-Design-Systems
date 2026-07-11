@@ -18,10 +18,11 @@
     "validate:index": "node scripts/validate-index.mjs",
     "validate:design-md": "node scripts/validate-design-md.mjs",
     "validate:jsic": "node scripts/validate-jsic.mjs",
+    "validate:taxonomy": "node scripts/validate-taxonomy.mjs",
     "legal:check": "node scripts/legal-check.mjs",
     "a11y:check": "node scripts/a11y-check.mjs",
     "build:jsic": "node scripts/build-jsic.mjs",
-    "validate": "pnpm run validate:index && pnpm run validate:design-md && pnpm run validate:jsic && pnpm run legal:check && pnpm run a11y:check"
+    "validate": "pnpm run validate:index && pnpm run validate:design-md && pnpm run validate:jsic && pnpm run validate:taxonomy && pnpm run legal:check && pnpm run a11y:check"
   },
   "dependencies": {
     "marked": "^18.0.6",

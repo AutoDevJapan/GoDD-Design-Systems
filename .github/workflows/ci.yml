@@ -32,6 +32,8 @@ jobs:
         run: pnpm run validate:design-md
       - name: jsic.json をスキーマ + 整合性 + index 相互検証
         run: pnpm run validate:jsic
+      - name: taxonomy.json をスキーマ + index 相互検証 (color/mood 全カバー)
+        run: pnpm run validate:taxonomy
       - name: 法務チェック (de-brand / オープン書体 / 出典表示 · SSOT §8)
         run: pnpm run legal:check
       - name: a11y 不変条件チェック (skip-link / landmark / focus / contrast · #23)
