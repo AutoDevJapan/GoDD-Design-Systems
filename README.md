@@ -14,7 +14,10 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 |---|---|
 | `taxonomy.md` | `color` / `mood` の分類語彙 (SSOT) |
 | `index.json` | 材化済みセルのメタデータ (スキーマ: `documents/schema/index.schema.json`) |
+| `design-md/{jsic}/{color}/{mood}/DESIGN.md` | 材化済みセル本体 (形式: `documents/schema/design-md.schema.md`) |
+| `documents/schema/design-md.schema.json` | DESIGN.md frontmatter の JSON Schema |
 | `scripts/validate-index.mjs` | `index.json` をスキーマ + 整合性検証 (CI) |
+| `scripts/validate-design-md.mjs` | `DESIGN.md` を frontmatter + セクション構造 + index 整合検証 (CI) |
 | `app/`, `lib/`, `next.config.mjs` | 公開ブラウズ用の静的サイト (Next.js App Router / SSG) |
 
 ## 開発
@@ -25,7 +28,7 @@ Node.js >= 22 / pnpm >= 10。
 pnpm install
 pnpm dev        # サイトをローカル起動 (http://localhost:3000)
 pnpm build      # 静的サイトを out/ へ書き出し (next build, output: export)
-pnpm validate   # index.json を検証
+pnpm validate   # index.json と DESIGN.md を検証 (CI と同一)
 ```
 
 サイトのトップページは `index.json` と `taxonomy.md` の分類軸をもとに、
