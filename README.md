@@ -22,6 +22,7 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | `scripts/validate-jsic.mjs` | `jsic.json` をスキーマ + 親子整合 + `index.json` 相互検証 (CI) |
 | `scripts/build-jsic.mjs` | `jsic.json` の取込/整列/件数再計算パイプライン (再現可能) |
 | `scripts/legal-check.mjs` | de-brand / オープン書体 / 出典表示を検証する法務チェック (CI, SSOT §8) |
+| `scripts/build-og.mjs` | 各セル・トップの OGP/Twitter 画像 (`public/og/*.png`) をデザイントークン反映で生成 (`next/og`, 同梱 Noto Sans/OFL, self-contained) |
 | `LICENSE` / `NOTICE` | MIT ライセンス本文 / 第三者データ・書体の出典と帰属表示 |
 | `app/`, `lib/`, `next.config.mjs` | 公開ブラウズ用の静的サイト (Next.js App Router / SSG) |
 
@@ -32,7 +33,8 @@ Node.js >= 22 / pnpm >= 10。
 ```bash
 pnpm install
 pnpm dev        # サイトをローカル起動 (http://localhost:3000)
-pnpm build      # 静的サイトを out/ へ書き出し (next build, output: export)
+pnpm build      # OG 画像生成 (build:og) + 静的サイトを out/ へ書き出し (next build, output: export)
+pnpm build:og   # OGP/Twitter 画像のみ再生成 → public/og/*.png (トークン変更時。決定的・コミット対象)
 pnpm validate   # index.json / DESIGN.md / jsic.json + 法務チェックを検証 (CI と同一)
 pnpm legal:check # de-brand / オープン書体 / 出典表示のみを個別に検証
 ```

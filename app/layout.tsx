@@ -19,12 +19,16 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     locale: "ja_JP",
     url: "/",
+    // ビルド時に scripts/build-og.mjs が生成する OG 画像 (public/og/home.png)。
+    // metadataBase により絶対 URL 化される。
+    images: [{ url: "/og/home.png", width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: SITE_NAME,
     description:
       "業種 × カラー × ムードで整理した、AI が読む DESIGN.md のオープンカタログ。",
+    images: ["/og/home.png"],
   },
 };
 

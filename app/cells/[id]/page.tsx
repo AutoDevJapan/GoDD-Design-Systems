@@ -34,6 +34,10 @@ export async function generateMetadata({
 
   const canonical = `/cells/${entry.id}/`;
   const description = cellDescription(entry);
+  // ビルド時に scripts/build-og.mjs が各セルのトークン (カラー/ムード/業種) を
+  // 反映して生成する OG 画像 (public/og/{id}.png)。metadataBase で絶対 URL 化。
+  const ogImage = `/og/${entry.id}.png`;
+  const ogAlt = `${entry.title}（業種 ${entry.jsic} × カラー ${entry.color} × ムード ${entry.mood}）`;
   return {
     title: entry.title,
     description,
@@ -45,11 +49,13 @@ export async function generateMetadata({
       siteName: SITE_NAME,
       locale: "ja_JP",
       url: canonical,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: ogAlt }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: `${entry.title} — ${SITE_NAME}`,
       description,
+      images: [ogImage],
     },
   };
 }
