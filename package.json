@@ -12,7 +12,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build:og": "node scripts/build-og.mjs",
+    "build": "node scripts/build-og.mjs && next build",
     "start": "next start",
     "validate:index": "node scripts/validate-index.mjs",
     "validate:design-md": "node scripts/validate-design-md.mjs",
