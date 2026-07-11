@@ -5,12 +5,14 @@
   "license": "MIT",
   "description": "GoDD Design-Systems: 材化済み DESIGN.md コーパスと分類語彙 (公開 MIT)。",
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=22",
+    "pnpm": ">=10"
   },
   "scripts": {
     "validate:index": "node scripts/validate-index.mjs",
-    "validate": "npm run validate:index"
+    "validate": "pnpm run validate:index"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

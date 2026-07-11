@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # npm (検証ツール: ajv 等)
+  # npm ecosystem (pnpm-lock.yaml も対象。検証ツール: ajv 等)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:

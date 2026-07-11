@@ -19,14 +19,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
-          cache: npm
+          cache: pnpm
       - name: 依存インストール
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: index.json をスキーマ検証
-        run: npm run validate
+        run: pnpm run validate
 
   secrets-scan:
     name: gitleaks (機密検出)
