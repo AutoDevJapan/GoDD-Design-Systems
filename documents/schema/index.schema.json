@@ -5,7 +5,10 @@
   "description": "材化済みセル (design-md/{jsic}/{color}/{mood}/) のメタデータ一覧。追記 (accrete) 方式で成長する公開在庫の単一情報源。SSOT §2, §5 準拠。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "entries"],
+  "required": [
+    "version",
+    "entries"
+  ],
   "properties": {
     "$schema": {
       "type": "string",
@@ -24,7 +27,9 @@
     "entries": {
       "type": "array",
       "description": "材化済みセルのメタデータ。id で一意。accrete: 既存 entry は原則不変、追加のみ。",
-      "items": { "$ref": "#/$defs/entry" }
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
     }
   },
   "$defs": {
@@ -36,7 +41,16 @@
     "entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "path", "jsic", "color", "mood", "title", "hash", "createdAt"],
+      "required": [
+        "id",
+        "path",
+        "jsic",
+        "color",
+        "mood",
+        "title",
+        "hash",
+        "createdAt"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -64,7 +78,9 @@
         "tags": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/slug" },
+          "items": {
+            "$ref": "#/$defs/slug"
+          },
           "description": "任意。タイポ体系・レイアウト原型など、軸に掛けない差別化/検索用タグ (SSOT §2)。"
         },
         "title": {
@@ -77,6 +93,11 @@
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$",
           "description": "DESIGN.md 本文の内容ハッシュ。形式 `sha256:{64桁hex}`。変更検知/near-dup 用。"
+        },
+        "engineVersion": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "任意。このセルを生成した生成方式のフィンガープリント。形式 sha256:{64桁hex}。同一の軸文脈でも生成方式が変われば DESIGN.md 本文は変わりうるため、公開済みセルと現行 Generator の出力差（再現性ドリフト）を検出するために記録する。値は不可逆ハッシュであり生成方式の内容は復元できない。"
         },
         "createdAt": {
           "type": "string",
