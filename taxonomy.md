@@ -31,43 +31,48 @@
 
 color 値は次のいずれかの形をとる。
 
-- **有彩色**: `{hue-slug}-{tone-slug}` 例: `h02r-v` (vivid red)
-- **無彩色**: 無彩色 slug をそのまま使用 例: `gray`
+- **有彩色**: `{tone-slug}-{hue-slug}` 例: `v-h02` (vivid red)
+- **無彩色**: `ac-` + 段階 slug 例: `ac-mgy`
 
-理論上の有彩色は 24 色相 × 12 トーン = 288 通りだが、暗清色・低彩度側では
-色相差が視認しにくく無彩色へ収束するため、**実用 color 値は約 200**（無彩色を含む）。
-どの組合せを材化するかは `index.json` 側で管理し、本書は語彙のみを定義する。
+有彩色は 24 色相 × 12 トーン = **288 通り**で、格子は全て材化対象とする。無彩色 5 を加えた
+**293** が現行の color 語彙である。どの組合せを実際に材化したかは `index.json` 側で管理し、
+本書は語彙のみを定義する。
+
+かつては有彩色を `{hue-slug}-{tone-slug}`（例: `h17b-lt`）、無彩色を段階 slug そのまま
+（例: `gray`）としていた。§0 の「一度公開した slug は不変」に従い、旧 slug は §4 の alias 表に
+残して削除しない。**新規材化では旧 slug を使わない。**
 
 ### 1.1 hue (色相) — 24
 
-slug は `h` + 2桁番号 + 略号 (小文字) とし、番号衝突・略号重複を避け一意にする。
+slug は `h` + PCCS 番号 2桁とする。PCCS では略号が一部重複する (14/15 = BG, 17/18 = B) ため、
+番号だけで一意性を担保する。
 
 | slug | PCCS No. | 略号 | 英名 | 主要色相の目安 |
 |---|---|---|---|---|
-| `h01pr` | 1 | pR | purplish red | 赤紫寄りの赤 |
-| `h02r`  | 2 | R | red | 赤 (心理四原色) |
-| `h03yr` | 3 | yR | yellowish red | 黄み赤 |
-| `h04ro` | 4 | rO | reddish orange | 赤みオレンジ |
-| `h05o`  | 5 | O | orange | オレンジ |
-| `h06yo` | 6 | yO | yellowish orange | 黄みオレンジ |
-| `h07ry` | 7 | rY | reddish yellow | 赤み黄 |
-| `h08y`  | 8 | Y | yellow | 黄 (心理四原色) |
-| `h09gy` | 9 | gY | greenish yellow | 緑み黄 |
-| `h10yg` | 10 | YG | yellow green | 黄緑 |
-| `h11yg2`| 11 | yG | yellowish green | 黄み緑 |
-| `h12g`  | 12 | G | green | 緑 (心理四原色) |
-| `h13bg` | 13 | bG | bluish green | 青み緑 |
-| `h14bg2`| 14 | BG | blue green | 青緑 |
-| `h15bg3`| 15 | BG | blue green | 青緑 (寒色寄り) |
-| `h16gb` | 16 | gB | greenish blue | 緑み青 |
-| `h17b`  | 17 | B | blue | 青 |
-| `h18b2` | 18 | B | blue | 青 (心理四原色) |
-| `h19pb` | 19 | pB | purplish blue | 紫み青 |
-| `h20v`  | 20 | V | violet | 青紫 |
-| `h21bp` | 21 | bP | bluish purple | 青み紫 |
-| `h22p`  | 22 | P | purple | 紫 |
-| `h23rp` | 23 | rP | reddish purple | 赤み紫 |
-| `h24rp2`| 24 | RP | red purple | 赤紫 |
+| `h01` | 1 | pR | purplish red | 赤紫寄りの赤 |
+| `h02`  | 2 | R | red | 赤 (心理四原色) |
+| `h03` | 3 | yR | yellowish red | 黄み赤 |
+| `h04` | 4 | rO | reddish orange | 赤みオレンジ |
+| `h05`  | 5 | O | orange | オレンジ |
+| `h06` | 6 | yO | yellowish orange | 黄みオレンジ |
+| `h07` | 7 | rY | reddish yellow | 赤み黄 |
+| `h08`  | 8 | Y | yellow | 黄 (心理四原色) |
+| `h09` | 9 | gY | greenish yellow | 緑み黄 |
+| `h10` | 10 | YG | yellow green | 黄緑 |
+| `h11`| 11 | yG | yellowish green | 黄み緑 |
+| `h12`  | 12 | G | green | 緑 (心理四原色) |
+| `h13` | 13 | bG | bluish green | 青み緑 |
+| `h14`| 14 | BG | blue green | 青緑 |
+| `h15`| 15 | BG | blue green | 青緑 (寒色寄り) |
+| `h16` | 16 | gB | greenish blue | 緑み青 |
+| `h17`  | 17 | B | blue | 青 |
+| `h18` | 18 | B | blue | 青 (心理四原色) |
+| `h19` | 19 | pB | purplish blue | 紫み青 |
+| `h20`  | 20 | V | violet | 青紫 |
+| `h21` | 21 | bP | bluish purple | 青み紫 |
+| `h22`  | 22 | P | purple | 紫 |
+| `h23` | 23 | rP | reddish purple | 赤み紫 |
+| `h24`| 24 | RP | red purple | 赤紫 |
 
 > 補足: PCCS では略号が一部重複する (14/15 = BG, 17/18 = B)。slug は番号を含めることで一意性を担保している。
 
@@ -93,17 +98,17 @@ slug は `h` + 2桁番号 + 略号 (小文字) とし、番号衝突・略号重
 ### 1.3 achromatic (無彩色) — 5
 
 JIS の無彩色 (N) スケールに基づく段階。段階数は暫定 5（仕様の未確定事項: 3 or 5）。
-無彩色はトーンを持たないため、**tone-slug を付けず無彩色 slug をそのまま color 値とする**。
+無彩色はトーンを持たないため、**tone-slug を付けず `ac-` + 段階 slug を color 値とする**。
 
-| slug | 名称 | 目安 (明度 N) |
-|---|---|---|
-| `white`      | 白 | N9.5 付近 |
-| `gray-light` | 明灰 | N7-8 |
-| `gray`       | 中灰 | N5 |
-| `gray-dark`  | 暗灰 | N3 |
-| `black`      | 黒 | N1 付近 |
+| slug | 名称 | 目安 (明度 N) | 旧 slug |
+|---|---|---|---|
+| `ac-w`    | 白 | N9.5 付近 | `white` |
+| `ac-ltgy` | 明灰 | N7-8 | `gray-light` |
+| `ac-mgy`  | 中灰 | N5 | `gray` |
+| `ac-dkgy` | 暗灰 | N3 | `gray-dark` |
+| `ac-bk`   | 黒 | N1 付近 | `black` |
 
-> 3 段階運用に切替える場合は `white` / `gray` / `black` を採用し、`gray-light` / `gray-dark` を alias とする。
+> 3 段階運用に切替える場合は `ac-w` / `ac-mgy` / `ac-bk` を採用し、`ac-ltgy` / `ac-dkgy` を alias とする。
 
 ---
 
@@ -197,15 +202,22 @@ mood は 6 つの観点 (energy / temperature / formality / personality / era / 
 
 ## 3. 集計
 
-- color: hue 24 × tone 12 = 288 (理論) → 実用 約 200 + 無彩色 5。
+- color: 有彩色 hue 24 × tone 12 = **288**（格子は全て材化対象）+ 無彩色 **5** = **293**。
+  これに §4 の旧 slug alias 6 件を加えた 299 件を `taxonomy.json` が保持する。
 - mood: 8 + 6 + 8 + 10 + 8 + 10 = **50**。
 
 ## 4. alias 表
 
-改名・段階変更時の後方互換用。現時点でのエントリはなし。
+改名・段階変更時の後方互換用。旧 slug は §0 に従い削除せず維持する。新規材化では使わない。
 
 | 旧 slug | 新 slug | 種別 | 備考 |
 |---|---|---|---|
+| `h17b-lt` | `lt-h17` | color | 有彩色の旧 `{hue}-{tone}` 形式。公開済みセルが使用中 |
+| `white` | `ac-w` | color | 無彩色の旧 slug |
+| `gray-light` | `ac-ltgy` | color | 無彩色の旧 slug |
+| `gray` | `ac-mgy` | color | 無彩色の旧 slug |
+| `gray-dark` | `ac-dkgy` | color | 無彩色の旧 slug |
+| `black` | `ac-bk` | color | 無彩色の旧 slug |
 
 ---
 
