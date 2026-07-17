@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "marked": "^18.0.6",
-    "next": "^15.5.7",
+    "next": "^16.2.10",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
@@ -36,6 +36,6 @@
     "@types/react-dom": "^19.2.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   }
 }
