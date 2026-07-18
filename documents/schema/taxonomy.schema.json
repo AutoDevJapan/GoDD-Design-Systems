@@ -5,7 +5,11 @@
   "description": "color / mood slug の機械可読な日本語ラベル契約。taxonomy.md (SSOT) を出典とし、Matrix Pages が raw URL から実行時 fetch してファセットラベルを日本語化する。SSOT §2 準拠。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "colors", "moods"],
+  "required": [
+    "version",
+    "colors",
+    "moods"
+  ],
   "properties": {
     "version": {
       "type": "integer",
@@ -15,15 +19,23 @@
     "colors": {
       "type": "object",
       "description": "color slug -> 日本語ラベル。キーは taxonomy.md §1 の color 語彙 (有彩色 {tone}-{hue} / 旧 {hue}-{tone} / 無彩色 slug)。",
-      "propertyNames": { "$ref": "#/$defs/slug" },
-      "additionalProperties": { "$ref": "#/$defs/colorEntry" },
+      "propertyNames": {
+        "$ref": "#/$defs/slug"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/colorEntry"
+      },
       "minProperties": 1
     },
     "moods": {
       "type": "object",
       "description": "mood slug -> 日本語ラベル。キーは taxonomy.md §2 の mood 語彙。",
-      "propertyNames": { "$ref": "#/$defs/slug" },
-      "additionalProperties": { "$ref": "#/$defs/moodEntry" },
+      "propertyNames": {
+        "$ref": "#/$defs/slug"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/moodEntry"
+      },
       "minProperties": 1
     }
   },
@@ -36,38 +48,74 @@
     "colorEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name_ja", "family", "family_ja"],
+      "required": [
+        "name_ja",
+        "family",
+        "family_ja"
+      ],
       "properties": {
         "name_ja": {
           "type": "string",
           "minLength": 1,
           "description": "自然な日本語のカラー名 (例: ダルトーンの赤みの黄 / 白)。"
         },
+        "name_en": {
+          "type": "string",
+          "minLength": 1,
+          "description": "英語のカラー名（例: bright purplish red / white）。任意。UI の言語切替に用いる。"
+        },
         "family": {
           "type": "string",
-          "enum": ["red", "orange", "yellow", "green", "blue", "purple", "achromatic"],
+          "enum": [
+            "red",
+            "orange",
+            "yellow",
+            "green",
+            "blue",
+            "purple",
+            "achromatic"
+          ],
           "description": "カラー系統 (family) の slug。"
         },
         "family_ja": {
           "type": "string",
           "pattern": "系$",
           "description": "カラー系統の日本語名 (例: 赤系 / 無彩色系)。末尾は「系」。"
+        },
+        "family_en": {
+          "type": "string",
+          "description": "カラー系統の英語名（red / blue / achromatic など）。任意。"
         }
       }
     },
     "moodEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name_ja", "axis"],
+      "required": [
+        "name_ja",
+        "axis"
+      ],
       "properties": {
         "name_ja": {
           "type": "string",
           "minLength": 1,
           "description": "自然な日本語のムード名 (例: ブルータル / やさしい / 禅)。"
         },
+        "name_en": {
+          "type": "string",
+          "minLength": 1,
+          "description": "英語のムード名（例: minimal / trustworthy）。任意。UI の言語切替に用いる。"
+        },
         "axis": {
           "type": "string",
-          "enum": ["energy", "温度", "格", "性格", "時代", "情緒"],
+          "enum": [
+            "energy",
+            "温度",
+            "格",
+            "性格",
+            "時代",
+            "情緒"
+          ],
           "description": "taxonomy.md §2 の 6 観点のいずれか。"
         }
       }
