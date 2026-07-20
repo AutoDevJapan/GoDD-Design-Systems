@@ -4,8 +4,9 @@ title: "デザインシステム: 主として管理事務を行う本社等（J
 jsic: "2900"
 color: "v-h22"
 mood: "zen"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---
@@ -20,19 +21,19 @@ generatedAt: "2025-01-01T00:00:00.000Z"
 視線を一点ずつ運ぶ。動きは最小限にとどめ、静的な構図で安定と明快さを担保する。
 
 ## カラーシステム / color-system
-役割ベースのカラートークンで配色を定義する。特定の色名ではなく役割で参照し、
-テーマ差し替えに耐える構造にする。
+primary と 180°補色アクセントの対比を主役に据えた高コントラスト配色。役割トークンで参照し、
+彩度の高いアクセントは面積を絞って主張点だけに用いる。
 
 | 役割 | トークン | 値 |
 | --- | --- | --- |
 | Primary | `--color-primary` | #A806F9 |
-| Secondary | `--color-secondary` | #7E33A3 |
-| Accent | `--color-accent` | #CCF20D |
-| Neutral | `--color-neutral` | #917E9A |
-| Background | `--color-bg` | #F8F7F8 |
-| Foreground | `--color-fg` | #251F28 |
+| Secondary | `--color-secondary` | #701F99 |
+| Accent（補色） | `--color-accent` | #51E109 |
+| Neutral | `--color-neutral` | #8B7198 |
+| Background | `--color-bg` | #F5F4F6 |
+| Foreground | `--color-fg` | #201A23 |
 
-**コントラスト**: 背景 #F8F7F8 と前景 #251F28 を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #CCF20D は面積を絞って用いる。
+**コントラスト**: 背景 #F5F4F6 と前景 #201A23 を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #51E109 は面積を絞って用いる。
 
 ## タイポグラフィ / typography
 静かな読み物志向で、控えめなサイズ差と軽めのウェイトで穏やかな可読性を優先する。

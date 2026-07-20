@@ -4,8 +4,9 @@ title: "デザインシステム: 主として管理事務を行う本社等（J
 jsic: "2900"
 color: "s-h11"
 mood: "cozy"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---
@@ -20,29 +21,31 @@ generatedAt: "2025-01-01T00:00:00.000Z"
 丸みと間で壁の低さを演出し、初見の利用者にも入りやすい導入をつくる。
 
 ## カラーシステム / color-system
-役割ベースのカラートークンで配色を定義する。特定の色名ではなく役割で参照し、
-テーマ差し替えに耐える構造にする。
+primary と 180°補色アクセントの対比を主役に据えた高コントラスト配色。役割トークンで参照し、
+彩度の高いアクセントは面積を絞って主張点だけに用いる。
 
 | 役割 | トークン | 値 |
 | --- | --- | --- |
 | Primary | `--color-primary` | #61DA1B |
-| Secondary | `--color-secondary` | #8DC56D |
-| Accent | `--color-accent` | #371CE3 |
-| Neutral | `--color-neutral` | #899A7E |
-| Background | `--color-bg` | #F7F8F7 |
-| Foreground | `--color-fg` | #23281F |
+| Secondary | `--color-secondary` | #9CD879 |
+| Accent（補色） | `--color-accent` | #8E1AD1 |
+| Neutral | `--color-neutral` | #7F9871 |
+| Background | `--color-bg` | #F5F6F4 |
+| Foreground | `--color-fg` | #1D231A |
 
-**コントラスト**: 背景 #F7F8F7 と前景 #23281F を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #371CE3 は面積を絞って用いる。
+**コントラスト**: 背景 #F5F6F4 と前景 #1D231A を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #8E1AD1 は面積を絞って用いる。
 
 ## タイポグラフィ / typography
-汎用サンセリフのシステムフォントスタックで可読性と中立性を確保する。特定の商標フォント名は
-用いず、OS 標準の書体へフォールバックする。
+人間味のあるサンセリフ志向で、開いた字面と自然なリズムを優先し可読性を最大化する。
+商標フォント名は用いず、OS 標準の書体へフォールバックする。
 
 - **見出し**: system-ui
 - **本文**: ui-sans-serif
 - **推奨スタック**: `system-ui, ui-sans-serif, sans-serif`
-- **タイプスケール**: `0.833rem` · `1rem` · `1.2rem` · `1.44rem` · `1.728rem` · `2.074rem`
-- **ウェイト**: 400 / 500 / 700
+- **タイプスケール**: `0.885rem` · `1.063rem` · `1.275rem` · `1.53rem` · `1.836rem` · `2.203rem`
+- **ウェイト**: 400 / 500 / 600
+
+本文の行長は 45〜75 文字を目安に保ち、長文でも疲れにくい組版にする。
 
 ## 余白とレイアウト / spacing-layout
 余白を主役にした流動的なキャンバス構成。要素同士の間隔で階層を示し、開放感を優先する。

@@ -4,8 +4,9 @@ title: "デザインシステム: 主として管理事務を行う本社等（J
 jsic: "2900"
 color: "g-h06"
 mood: "techy"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---

@@ -4,8 +4,9 @@ title: "デザインシステム: 建築用木製組立材料製造業（JSIC 12
 jsic: "1224"
 color: "sf-h22"
 mood: "calm"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---

@@ -4,8 +4,9 @@ title: "デザインシステム: 舗装工事業（JSIC 0631） / ボールド 
 jsic: "0631"
 color: "v-h20"
 mood: "bold"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---
@@ -21,29 +22,31 @@ generatedAt: "2025-01-01T00:00:00.000Z"
 範囲に抑える。
 
 ## カラーシステム / color-system
-役割ベースのカラートークンで配色を定義する。特定の色名ではなく役割で参照し、
-テーマ差し替えに耐える構造にする。
+primary と 180°補色アクセントの対比を主役に据えた高コントラスト配色。役割トークンで参照し、
+彩度の高いアクセントは面積を絞って主張点だけに用いる。
 
 | 役割 | トークン | 値 |
 | --- | --- | --- |
 | Primary | `--color-primary` | #1B06F9 |
-| Secondary | `--color-secondary` | #3D33A3 |
-| Accent | `--color-accent` | #F2930D |
-| Neutral | `--color-neutral` | #817E9A |
-| Background | `--color-bg` | #F7F7F8 |
-| Foreground | `--color-fg` | #201F28 |
+| Secondary | `--color-secondary` | #291F99 |
+| Accent（補色） | `--color-accent` | #CFE109 |
+| Neutral | `--color-neutral` | #747198 |
+| Background | `--color-bg` | #F4F4F6 |
+| Foreground | `--color-fg` | #1B1A23 |
 
-**コントラスト**: 背景 #F7F7F8 と前景 #201F28 を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #F2930D は面積を絞って用いる。
+**コントラスト**: 背景 #F4F4F6 と前景 #1B1A23 を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #CFE109 は面積を絞って用いる。
 
 ## タイポグラフィ / typography
-汎用サンセリフのシステムフォントスタックで可読性と中立性を確保する。特定の商標フォント名は
-用いず、OS 標準の書体へフォールバックする。
+表現的なディスプレイ志向で、大きなサイズ差と強いウェイト差で見出しに躍動と勢いを与える。
+商標フォント名は用いず、OS 標準の書体へフォールバックする。
 
 - **見出し**: system-ui
 - **本文**: ui-sans-serif
 - **推奨スタック**: `system-ui, ui-sans-serif, sans-serif`
-- **タイプスケール**: `0.75rem` · `1rem` · `1.333rem` · `1.777rem` · `2.369rem` · `3.157rem`
-- **ウェイト**: 400 / 600 / 800
+- **タイプスケール**: `0.714rem` · `1rem` · `1.4rem` · `1.96rem` · `2.744rem` · `3.842rem`
+- **ウェイト**: 500 / 700 / 900
+
+見出しは大胆に、本文は可読性を保つ。強いコントラストで視線の起伏を設計する。
 
 ## 余白とレイアウト / spacing-layout
 反復するモジュールブロックでリズムを刻む構成。ブロック単位で間隔を揃え、明快な区切りを与える。

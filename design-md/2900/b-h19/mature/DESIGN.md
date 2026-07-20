@@ -4,8 +4,9 @@ title: "デザインシステム: 主として管理事務を行う本社等（J
 jsic: "2900"
 color: "b-h19"
 mood: "mature"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---
@@ -20,19 +21,20 @@ generatedAt: "2025-01-01T00:00:00.000Z"
 余白は語りの句読点として機能させ、要素の登場順に意味の階層を与える。
 
 ## カラーシステム / color-system
-役割ベースのカラートークンで配色を定義する。特定の色名ではなく役割で参照し、
-テーマ差し替えに耐える構造にする。
+色相環を三分割したトライアド配色で、基調色とバランスの取れたアクセントを導く配色。
+役割トークンで参照し、面積比でアクセントを制御して均衡を保つ。
 
 | 役割 | トークン | 値 |
 | --- | --- | --- |
 | Primary | `--color-primary` | #456CED |
-| Secondary | `--color-secondary` | #4D67BC |
-| Accent | `--color-accent` | #E94F16 |
-| Neutral | `--color-neutral` | #7E859A |
-| Background | `--color-bg` | #F7F7F8 |
-| Foreground | `--color-fg` | #1F2128 |
+| Secondary | `--color-secondary` | #3E5AB7 |
+| Accent（三分割） | `--color-accent` | #DF1644 |
+| Neutral | `--color-neutral` | #767E98 |
+| Background | `--color-bg` | #F4F4F6 |
+| Foreground | `--color-fg` | #1D1F25 |
 
-**コントラスト**: 背景 #F7F7F8 と前景 #1F2128 を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #E94F16 は面積を絞って用いる。
+- アクセントは面積を絞り、三色の均衡を崩さない範囲で用いる。
+- **コントラスト**: 背景 #F4F4F6 と前景 #1D1F25 を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #DF1644 は面積を絞って用いる。
 
 ## タイポグラフィ / typography
 見出しにセリフ、本文にサンセリフを組み合わせる editorial 志向。品位とコントラストを両立し、

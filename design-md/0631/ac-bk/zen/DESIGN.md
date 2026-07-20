@@ -4,8 +4,9 @@ title: "デザインシステム: 舗装工事業（JSIC 0631） / ゼン / 黒 
 jsic: "0631"
 color: "ac-bk"
 mood: "zen"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---

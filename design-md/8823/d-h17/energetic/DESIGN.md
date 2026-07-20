@@ -4,8 +4,9 @@ title: "デザインシステム: 特別管理産業廃棄物収集運搬業（J
 jsic: "8823"
 color: "d-h17"
 mood: "energetic"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---

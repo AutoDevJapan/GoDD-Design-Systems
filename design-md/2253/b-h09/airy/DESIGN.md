@@ -4,8 +4,9 @@ title: "デザインシステム: 鋳鋼製造業（JSIC 2253） / エアリー 
 jsic: "2253"
 color: "b-h09"
 mood: "airy"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---
@@ -20,19 +21,20 @@ generatedAt: "2025-01-01T00:00:00.000Z"
 視線を一点ずつ運ぶ。動きは最小限にとどめ、静的な構図で安定と明快さを担保する。
 
 ## カラーシステム / color-system
-役割ベースのカラートークンで配色を定義する。特定の色名ではなく役割で参照し、
-テーマ差し替えに耐える構造にする。
+色相環を三分割したトライアド配色で、基調色とバランスの取れたアクセントを導く配色。
+役割トークンで参照し、面積比でアクセントを制御して均衡を保つ。
 
 | 役割 | トークン | 値 |
 | --- | --- | --- |
 | Primary | `--color-primary` | #DCED45 |
-| Secondary | `--color-secondary` | #B1BC4D |
-| Accent | `--color-accent` | #166AE9 |
-| Neutral | `--color-neutral` | #979A7E |
-| Background | `--color-bg` | #F8F8F7 |
-| Foreground | `--color-fg` | #27281F |
+| Secondary | `--color-secondary` | #ABB73E |
+| Accent（三分割） | `--color-accent` | #16CBDF |
+| Neutral | `--color-neutral` | #959876 |
+| Background | `--color-bg` | #F5F6F4 |
+| Foreground | `--color-fg` | #25251D |
 
-**コントラスト**: 背景 #F8F8F7 と前景 #27281F を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #166AE9 は面積を絞って用いる。
+- アクセントは面積を絞り、三色の均衡を崩さない範囲で用いる。
+- **コントラスト**: 背景 #F5F6F4 と前景 #25251D を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #16CBDF は面積を絞って用いる。
 
 ## タイポグラフィ / typography
 静かな読み物志向で、控えめなサイズ差と軽めのウェイトで穏やかな可読性を優先する。

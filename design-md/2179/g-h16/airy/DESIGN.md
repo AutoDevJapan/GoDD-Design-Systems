@@ -4,8 +4,9 @@ title: "デザインシステム: その他の研磨材・同製品製造業（J
 jsic: "2179"
 color: "g-h16"
 mood: "airy"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---

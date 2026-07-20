@@ -4,8 +4,9 @@ title: "デザインシステム: 発酵工業（JSIC 1633） / プレミアム 
 jsic: "1633"
 color: "dp-h06"
 mood: "premium"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---

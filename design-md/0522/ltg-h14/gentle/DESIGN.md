@@ -4,8 +4,9 @@ title: "デザインシステム: 亜炭鉱業（JSIC 0522） / ジェントル 
 jsic: "0522"
 color: "ltg-h14"
 mood: "gentle"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---

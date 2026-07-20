@@ -4,8 +4,9 @@ title: "デザインシステム: 舗装工事業（JSIC 0631） / テッキー 
 jsic: "0631"
 color: "s-h10"
 mood: "techy"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---
@@ -20,19 +21,19 @@ generatedAt: "2025-01-01T00:00:00.000Z"
 状態と階層を明確な規則で示して、技術的な精度感と信頼を担保する。
 
 ## カラーシステム / color-system
-役割ベースのカラートークンで配色を定義する。特定の色名ではなく役割で参照し、
-テーマ差し替えに耐える構造にする。
+primary と 180°補色アクセントの対比を主役に据えた高コントラスト配色。役割トークンで参照し、
+彩度の高いアクセントは面積を絞って主張点だけに用いる。
 
 | 役割 | トークン | 値 |
 | --- | --- | --- |
 | Primary | `--color-primary` | #94DA1B |
-| Secondary | `--color-secondary` | #A5C56D |
-| Accent | `--color-accent` | #1C37E3 |
-| Neutral | `--color-neutral` | #909A7E |
-| Background | `--color-bg` | #F7F8F7 |
-| Foreground | `--color-fg` | #25281F |
+| Secondary | `--color-secondary` | #B5D879 |
+| Accent（補色） | `--color-accent` | #5D1AD1 |
+| Neutral | `--color-neutral` | #8A9871 |
+| Background | `--color-bg` | #F5F6F4 |
+| Foreground | `--color-fg` | #20231A |
 
-**コントラスト**: 背景 #F7F8F7 と前景 #25281F を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #1C37E3 は面積を絞って用いる。
+**コントラスト**: 背景 #F5F6F4 と前景 #20231A を基準に、本文テキストは WCAG AA（4.5:1）以上を満たす。アクセント #5D1AD1 は面積を絞って用いる。
 
 ## タイポグラフィ / typography
 幾何学的なサンセリフ志向で、均一な字面と明快なウェイト差を活かす。特定の商標フォント名は

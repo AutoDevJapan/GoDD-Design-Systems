@@ -4,8 +4,9 @@ title: "デザインシステム: 介護医療院（JSIC 8543） / マチュア 
 jsic: "8543"
 color: "sf-h18"
 mood: "mature"
+variant: 0
 tags: []
-schemaVersion: 1
+schemaVersion: 2
 license: "MIT"
 generatedAt: "2025-01-01T00:00:00.000Z"
 ---
