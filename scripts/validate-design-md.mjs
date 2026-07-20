@@ -177,11 +177,16 @@ for (const relPath of files) {
 
   // 3. パス整合。
   if (fm.jsic && fm.color && fm.mood) {
-    const expectedPath = `design-md/${fm.jsic}/${fm.color}/${fm.mood}/DESIGN.md`;
+    const v = fm.variant ?? 0;
+    const expectedPath = v > 0
+      ? `design-md/${fm.jsic}/${fm.color}/${fm.mood}/v${v}/DESIGN.md`
+      : `design-md/${fm.jsic}/${fm.color}/${fm.mood}/DESIGN.md`;
     if (relPath !== expectedPath) {
       fail(`${at}: パスが frontmatter から導かれる "${expectedPath}" と一致しません`);
     }
-    const expectedId = `${fm.jsic}_${fm.color}_${fm.mood}`;
+    const expectedId = v > 0
+      ? `${fm.jsic}_${fm.color}_${fm.mood}_v${v}`
+      : `${fm.jsic}_${fm.color}_${fm.mood}`;
     if (fm.id !== expectedId) {
       fail(`${at}: id "${fm.id}" が jsic/color/mood から導かれる "${expectedId}" と一致しません`);
     }

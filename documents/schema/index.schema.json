@@ -54,13 +54,13 @@
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^[0-9]{4}_[a-z0-9]+(-[a-z0-9]+)*_[a-z0-9]+(-[a-z0-9]+)*$",
-          "description": "セルの安定 ID。形式 `{jsic}_{color}_{mood}`。URL/参照キーとして不変。"
+          "pattern": "^[0-9]{4}_[a-z0-9]+(-[a-z0-9]+)*_[a-z0-9]+(-[a-z0-9]+)*(_v[1-9][0-9]*)?$",
+          "description": "セルの安定 ID。形式 `{jsic}_{color}_{mood}`。variant>0 は `_v{n}` 接尾。URL/参照キーとして不変。"
         },
         "path": {
           "type": "string",
-          "pattern": "^design-md/[0-9]{4}/[a-z0-9]+(-[a-z0-9]+)*/[a-z0-9]+(-[a-z0-9]+)*/DESIGN\\.md$",
-          "description": "リポジトリ相対の DESIGN.md パス。ディレクトリ構造 design-md/{jsic}/{color}/{mood}/DESIGN.md に一致。"
+          "pattern": "^design-md/[0-9]{4}/[a-z0-9]+(-[a-z0-9]+)*/[a-z0-9]+(-[a-z0-9]+)*/(v[1-9][0-9]*/)?DESIGN\\.md$",
+          "description": "リポジトリ相対の DESIGN.md パス。ディレクトリ構造 design-md/{jsic}/{color}/{mood}[/v{n}]/DESIGN.md に一致。"
         },
         "jsic": {
           "type": "string",
@@ -74,6 +74,11 @@
         "mood": {
           "$ref": "#/$defs/slug",
           "description": "ムード軸の slug。taxonomy.md §2 の語彙 (通常1セル1つ)。"
+        },
+        "variant": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "任意。バリアント番号。基底セルは 0 または省略、変種は 1 以上の整数。"
         },
         "tags": {
           "type": "array",
