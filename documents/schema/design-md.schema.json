@@ -9,8 +9,13 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^[0-9]{4}_[a-z0-9]+(-[a-z0-9]+)*_[a-z0-9]+(-[a-z0-9]+)*$",
-      "description": "セルの安定 ID。形式 `{jsic}_{color}_{mood}`。index.json の entry.id と一致する。"
+      "pattern": "^[0-9]{4}_[a-z0-9]+(-[a-z0-9]+)*_[a-z0-9]+(-[a-z0-9]+)*(_v[1-9][0-9]*)?$",
+      "description": "セルの安定 ID。形式 `{jsic}_{color}_{mood}`。variant>0 は `_v{n}` 接尾。index.json の entry.id と一致する。"
+    },
+    "variant": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "任意。バリアント番号。基底セルは 0 または省略、変種は 1 以上の整数。"
     },
     "title": {
       "type": "string",

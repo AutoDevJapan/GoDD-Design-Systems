@@ -52,11 +52,16 @@ entries.forEach((entry, i) => {
   }
   // id は `{jsic}_{color}_{mood}` と一致する必要がある。
   if (jsic && color && mood) {
-    const expectedId = `${jsic}_${color}_${mood}`;
+    const v = entry.variant ?? 0;
+    const expectedId = v > 0
+      ? `${jsic}_${color}_${mood}_v${v}`
+      : `${jsic}_${color}_${mood}`;
     if (id !== expectedId) {
       errors.push(`${at}: id "${id}" が jsic/color/mood から導かれる "${expectedId}" と一致しません`);
     }
-    const expectedPath = `design-md/${jsic}/${color}/${mood}/DESIGN.md`;
+    const expectedPath = v > 0
+      ? `design-md/${jsic}/${color}/${mood}/v${v}/DESIGN.md`
+      : `design-md/${jsic}/${color}/${mood}/DESIGN.md`;
     if (path !== expectedPath) {
       errors.push(`${at}: path "${path}" が期待値 "${expectedPath}" と一致しません`);
     }
