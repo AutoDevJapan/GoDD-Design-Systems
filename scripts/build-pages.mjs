@@ -3,11 +3,13 @@
 // 51k セル HTML / 全件 OG は生成せず、サイト chrome（`/` `/en/`）+ カタログのみ。
 
 import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "..");
+const require = createRequire(import.meta.url);
 
 process.env.GODD_PAGES_BUILD = "1";
 process.env.NEXT_PUBLIC_SITE_URL ??=
@@ -29,9 +31,21 @@ function run(cmd, args) {
     process.exit(1);
   }
   if (r.status !== 0) {
-    console.error(`[build-pages] command failed: ${cmd} ${args.join(" ")} (status=${r.status})`);
+    console.error(
+      `[build-pages] command failed: ${cmd} ${args.join(" ")} (status=${r.status})`,
+    );
     process.exit(r.status ?? 1);
   }
+}
+
+// Next が typescript を解決できることを先に確認（未解決だと検証段階で無言 fail しうる）。
+try {
+  const tsPath = require.resolve("typescript/package.json", { paths: [root] });
+  const { version } = require(tsPath);
+  console.log(`[build-pages] typescript resolved: v${version} @ ${tsPath}`);
+} catch (err) {
+  console.error("[build-pages] typescript resolve failed:", err);
+  process.exit(1);
 }
 
 console.log(
@@ -40,6 +54,7 @@ console.log(
 );
 
 run("node", ["scripts/build-og.mjs"]);
-run("pnpm", ["exec", "next", "build"]);
+// next バイナリを直接叩き、pnpm exec 経由の終了コード握りつぶしを避ける。
+run(process.execPath, [resolve(root, "node_modules/next/dist/bin/next"), "build"]);
 
 console.log("[build-pages] OK → out/");
