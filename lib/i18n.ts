@@ -1,6 +1,7 @@
 /**
  * サイト chrome 向けの最小 i18n（Issue #25 / ADR-0002）。
  * DESIGN.md 本文の一括翻訳は対象外。セル詳細のロケール二重静的生成もしない。
+ * セル chrome は単一路線 `/cells/{id}/` + `?lang=en` で切り替える（Phase 1）。
  *
  * メッセージは Client Component へ渡せるようプレーンな文字列のみとする。
  */
@@ -9,13 +10,38 @@ export const LOCALES = ["ja", "en"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "ja";
 
+/** セル詳細の言語クエリ（静的二重生成を避ける）。 */
+export const LANG_QUERY = "lang";
+
 export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value);
+}
+
+/** `?lang=en` のみを英語とみなす（他値は既定 ja）。 */
+export function localeFromSearch(search: string): Locale {
+  const params = new URLSearchParams(
+    search.startsWith("?") ? search.slice(1) : search,
+  );
+  return params.get(LANG_QUERY) === "en" ? "en" : "ja";
 }
 
 /** ロケール別のホームパス（trailingSlash 前提）。 */
 export function homePath(locale: Locale): string {
   return locale === "en" ? "/en/" : "/";
+}
+
+/** セル詳細パス。EN chrome は `?lang=en` を付与（`/en/cells/` は作らない）。 */
+export function cellPath(id: string, locale: Locale = "ja"): string {
+  const base = `/cells/${id}/`;
+  return locale === "en" ? `${base}?${LANG_QUERY}=en` : base;
+}
+
+/** 表示タイトル。`titleEn` があれば EN で優先、なければ `title`。 */
+export function displayTitle(
+  entry: { title: string; titleEn?: string },
+  locale: Locale,
+): string {
+  return locale === "en" ? (entry.titleEn ?? entry.title) : entry.title;
 }
 
 export type UiMessages = {
@@ -47,6 +73,18 @@ export type UiMessages = {
   localeNameJa: string;
   localeNameEn: string;
   corpusNotice: string;
+  backToCatalog: string;
+  breadcrumbLabel: string;
+  fieldId: string;
+  fieldDesignMd: string;
+  fieldJsic: string;
+  fieldColor: string;
+  fieldMood: string;
+  fieldTags: string;
+  fieldHash: string;
+  fieldCreatedAt: string;
+  designHeading: string;
+  designEmpty: string;
   /** Pages remote カタログ読込中。 */
   catalogLoading: string;
   /** Pages remote カタログ読込失敗。 */
@@ -84,7 +122,20 @@ const ja: UiMessages = {
   localeNameJa: "日本語",
   localeNameEn: "English",
   corpusNotice:
-    "セル詳細ページと DESIGN.md 本文は現時点では日本語のみです（英語併記は段階導入中）。",
+    "DESIGN.md 本文は現時点では日本語のままです。ページ chrome と分類ラベルは言語切替に追従します。",
+  backToCatalog: "← カタログへ戻る",
+  breadcrumbLabel: "パンくず",
+  fieldId: "id",
+  fieldDesignMd: "DESIGN.md",
+  fieldJsic: "業種 (JSIC)",
+  fieldColor: "カラー",
+  fieldMood: "ムード",
+  fieldTags: "タグ",
+  fieldHash: "hash",
+  fieldCreatedAt: "createdAt",
+  designHeading: "DESIGN.md 本文",
+  designEmpty:
+    "このセルはまだ DESIGN.md 本文が材化されていません（上記パスを参照）。",
   catalogLoading: "カタログを読み込んでいます…",
   catalogLoadError:
     "カタログの読み込みに失敗しました。しばらくしてから再読み込みしてください。",
@@ -121,7 +172,20 @@ const en: UiMessages = {
   localeNameJa: "日本語",
   localeNameEn: "English",
   corpusNotice:
-    "Cell detail pages and DESIGN.md bodies are Japanese-only for now (English co-presence is rolling out in phases).",
+    "DESIGN.md body text remains Japanese for now. Page chrome and taxonomy labels follow the language switcher.",
+  backToCatalog: "← Back to catalog",
+  breadcrumbLabel: "Breadcrumb",
+  fieldId: "id",
+  fieldDesignMd: "DESIGN.md",
+  fieldJsic: "Industry (JSIC)",
+  fieldColor: "Color",
+  fieldMood: "Mood",
+  fieldTags: "Tags",
+  fieldHash: "hash",
+  fieldCreatedAt: "createdAt",
+  designHeading: "DESIGN.md body",
+  designEmpty:
+    "This cell has no materialized DESIGN.md body yet (see the path above).",
   catalogLoading: "Loading catalog…",
   catalogLoadError: "Failed to load the catalog. Please reload and try again.",
 };

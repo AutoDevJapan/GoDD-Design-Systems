@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { loadDesignSections, loadIndex, type Entry } from "@/lib/catalog";
-import { listStaticCellParams } from "@/lib/pages-build";
 import { CellDetail } from "@/app/_components/cell-detail";
 import { taxonomyLabelsFor } from "@/lib/taxonomy-labels";
 import { displayTitle } from "@/lib/i18n";
@@ -13,12 +12,9 @@ function cellDescription(entry: Entry): string {
   return `業種 (JSIC) ${entry.jsic} × カラー ${entry.color} × ムード ${entry.mood} の DESIGN.md。AI がそのまま読んで一貫した UI を生成できるオープンカタログのセル${tags}。`;
 }
 
-/**
- * 静的エクスポート対象のセル id。
- * Pages ビルドでは既定 1 件のみ（51k HTML を CI に載せない — ADR-0004）。
- */
+/** 静的エクスポート: index.json の全 id をビルド時に列挙する。 */
 export function generateStaticParams(): { id: string }[] {
-  return listStaticCellParams();
+  return loadIndex().entries.map((e) => ({ id: e.id }));
 }
 
 // index.json に無い id は 404 (未知パラメータを生成しない)。

@@ -7,11 +7,8 @@ import {
   type CatalogCell,
 } from "@/app/_components/catalog-explorer";
 import { messagesFor, SITE_LANGUAGE_ALTERNATES } from "@/lib/i18n";
-import {
-  cellDetailHref,
-  isPagesBuild,
-  REMOTE_INDEX_URL,
-} from "@/lib/pages-build";
+import { isPagesBuild, REMOTE_INDEX_URL } from "@/lib/pages-build";
+import { taxonomyLabelsFor } from "@/lib/taxonomy-labels";
 import { SITE_NAME } from "@/lib/site";
 
 const locale = "ja" as const;
@@ -47,21 +44,20 @@ export default function HomePage() {
   // ローカル: 従来どおりビルド時埋め込み。
   const index = pages ? null : loadIndex();
   const summary = pages ? loadIndexSummary() : null;
-  const generatedAt = pages
-    ? summary!.generatedAt
-    : index!.generatedAt;
+  const generatedAt = pages ? summary!.generatedAt : index!.generatedAt;
 
   const cells: CatalogCell[] = pages
     ? []
     : index!.entries.map((e) => ({
         id: e.id,
         title: e.title,
+        titleEn: e.titleEn,
         jsic: e.jsic,
         color: e.color,
         mood: e.mood,
         tags: e.tags,
-        href: cellDetailHref(e),
       }));
+  const taxonomyLabels = taxonomyLabelsFor(locale);
 
   return (
     <div className="wrap">
@@ -77,6 +73,8 @@ export default function HomePage() {
         <CatalogExplorer
           cells={cells}
           messages={messages}
+          locale={locale}
+          taxonomyLabels={taxonomyLabels}
           remoteIndexUrl={pages ? REMOTE_INDEX_URL : undefined}
         />
       </main>

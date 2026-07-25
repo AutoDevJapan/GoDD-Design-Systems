@@ -1,4 +1,5 @@
 import { loadIndex, type Entry } from "@/lib/catalog";
+import { cellPath, type Locale } from "@/lib/i18n";
 import { githubBlobUrl } from "@/lib/site-urls";
 
 export { REMOTE_INDEX_URL, PAGES_SITE_URL } from "@/lib/site-urls";
@@ -61,10 +62,14 @@ export function listSitemapCellEntries(): Entry[] {
 /**
  * カタログカードの詳細リンク。
  * Pages ではセル HTML を出さないため、DESIGN.md の GitHub blob へ誘導する。
+ * ローカルは `/cells/{id}/`（EN は `?lang=en`）。
  */
-export function cellDetailHref(entry: Pick<Entry, "id" | "path">): string {
+export function cellDetailHref(
+  entry: Pick<Entry, "id" | "path">,
+  locale: Locale = "ja",
+): string {
   if (isPagesBuild()) {
     return githubBlobUrl(entry.path);
   }
-  return `/cells/${entry.id}/`;
+  return cellPath(entry.id, locale);
 }
