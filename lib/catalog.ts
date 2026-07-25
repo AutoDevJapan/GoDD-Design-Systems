@@ -2,6 +2,12 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { marked } from "marked";
 
+/**
+ * index ページング契約の固定ページサイズ。
+ * SSOT: documents/spec/index-paging.md / ADR-0001
+ */
+export const INDEX_PAGE_SIZE = 1000 as const;
+
 /** index.json の 1 エントリ (documents/schema/index.schema.json 準拠)。 */
 export type Entry = {
   id: string;
@@ -22,6 +28,27 @@ export type IndexFile = {
   entries: Entry[];
 };
 
+/** 軸 (jsic / color / mood / tag) ごとの出現数を集計するファセット。 */
+export type Facet = { value: string; count: number };
+
+export type Facets = {
+  jsic: Facet[];
+  color: Facet[];
+  mood: Facet[];
+  tag: Facet[];
+};
+
+/** index-summary.json (documents/schema/index-summary.schema.json 準拠)。 */
+export type IndexSummaryFile = {
+  version: number;
+  generatedAt: string;
+  sourceGeneratedAt: string;
+  entryCount: number;
+  pageSize: typeof INDEX_PAGE_SIZE;
+  pageCount: number;
+  facets: Facets;
+};
+
 const repoRoot = process.cwd();
 
 /**
@@ -33,8 +60,14 @@ export function loadIndex(): IndexFile {
   return JSON.parse(raw) as IndexFile;
 }
 
-/** 軸 (jsic / color / mood / tag) ごとの出現数を集計するファセット。 */
-export type Facet = { value: string; count: number };
+/**
+ * リポジトリルートの index-summary.json を読み込む。
+ * ファセットとページングメタのみ。ビルド時 (SSG) / サーバ専用。
+ */
+export function loadIndexSummary(): IndexSummaryFile {
+  const raw = readFileSync(join(repoRoot, "index-summary.json"), "utf8");
+  return JSON.parse(raw) as IndexSummaryFile;
+}
 
 function tally(values: string[]): Facet[] {
   const map = new Map<string, number>();
@@ -43,13 +76,6 @@ function tally(values: string[]): Facet[] {
     .map(([value, count]) => ({ value, count }))
     .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
 }
-
-export type Facets = {
-  jsic: Facet[];
-  color: Facet[];
-  mood: Facet[];
-  tag: Facet[];
-};
 
 /** エントリ集合から分類軸ごとのファセットを導出する。 */
 export function deriveFacets(entries: Entry[]): Facets {

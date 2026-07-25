@@ -1,6 +1,10 @@
 node_modules/
 *.log
 
+# Optional page shards from `pnpm run build:index-summary -- --pages`
+# (contract only in-repo; full shards are huge — see documents/spec/index-paging.md)
+/index/pages/
+
 # Next.js
 /.next/
 /out/
