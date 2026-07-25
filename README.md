@@ -14,7 +14,7 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 |---|---|
 | `taxonomy.md` | `color` / `mood` の分類語彙 (SSOT, 人間可読) |
 | `taxonomy.json` | `color` / `mood` slug → `name_ja` / `name_en` の機械可読契約 (スキーマ: `documents/schema/taxonomy.schema.json`)。サイトはロケールに応じてファセット表示へ接続 |
-| `jsic.json` | 業種軸 (日本標準産業分類 / JSIC) の code→名称→定義 (スキーマ: `documents/schema/jsic.schema.json`)。英名 (`name_en`) は未整備 |
+| `jsic.json` | 業種軸 (日本標準産業分類 / JSIC) の code→名称→定義 (スキーマ: `documents/schema/jsic.schema.json`)。任意 `name_en` は MIC 公式英語 Structure Notes 由来（部分収録: `documents/data/jsic-name-en.json`） |
 | `index.json` | 材化済みセルのメタデータ SSOT (スキーマ: `documents/schema/index.schema.json`) |
 | `index-summary.json` | 軽量サマリ（件数・`pageSize=1000`・ファセット）。消費者は明細より先に取得する (Issue #43 / ADR-0001) |
 | `index/pages/{n}.json` | 任意生成のページシャード（0-based）。**git にはコミットしない**。公開は Release タグ `index-pages`（ADR-0003） |
@@ -26,7 +26,7 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | `app/en/` | 英語ホーム（サイト chrome 英訳。セル本文は日本語のまま） |
 | `app/cells/[id]/` | セル詳細（単一路線。chrome EN は `?lang=en`。`/en/cells/` は置かない） |
 | `lib/i18n.ts` | サイト chrome 向け JA/EN メッセージ |
-| `lib/taxonomy-labels.ts` | taxonomy `name_ja` / `name_en` → ファセット表示ラベル |
+| `lib/taxonomy-labels.ts` | taxonomy / JSIC のロケール別表示ラベル（ファセット・セル chrome） |
 | `scripts/validate-index-pages.mjs` | 生成済み pages の契約検証（未生成時は SKIP） |
 | `scripts/package-index-pages.mjs` | Release 用ステージング（manifest + 個別 JSON） |
 | `.github/workflows/publish-index-pages.yml` | `workflow_dispatch` のみで pages を Release 公開 |
@@ -93,20 +93,19 @@ Pages のソースは **GitHub Actions**（リポジトリ Settings → Pages �
 ## 業種軸 (JSIC) の収録状況
 
 業種軸は `jsic.json` (日本標準産業分類 / JSIC 第14回改定・令和5年7月告示) を出典とする。
-**現時点は未完収録 (partial)** であり、以下を明示する (誇大表示しない)。
+日本語名称は全件収録済み。英語名称 (`name_en`) は MIC 公式英語 Structure Notes 由来で **部分収録**。
 
-| 階層 | 公式項目数 | 本リポジトリ収録数 |
-|---|---|---|
-| 大分類 | 20 | **20 (全件)** |
-| 中分類 | 99 | **99 (全件)** |
-| 小分類 | 536 | 7 (代表シード) |
-| 細分類 | 1,473 | 8 (代表シード) |
+| 階層 | 公式項目数 | 日本語 `name` | 英語 `name_en` |
+|---|---|---|---|
+| 大分類 | 20 | **20 (全件)** | **20 (全件)** |
+| 中分類 | 99 | **99 (全件)** | **99 (全件)** |
+| 小分類 | 536 | **536 (全件)** | 532 (partial) |
+| 細分類 | 1,473 | **1,473 (全件)** | 1,450 (partial) |
 
-- 大分類・中分類は全件収録済み。小分類・細分類は `index.json` で使用中のコード
-  (`6061` 書籍・雑誌小売業 / `7281` 経営コンサルタント業) を含む検証済みの代表項目のみ。
-- 残りの細分類は `scripts/build-jsic.mjs` の取込パイプライン (e-Stat 由来) で段階的に拡張する。
-  正確な最新件数は `jsic.json` の `meta.ingested` / `meta.official` を参照 (CI が配列長との一致を検証)。
-- 出典: 総務省 政策統括官（統計制度担当）/ e-Stat 政府統計の総合窓口。
+- 正確な最新件数は `jsic.json` の `meta.ingested` / `meta.official` / `meta.nameEn` を参照。
+- 英語ラベルの取込元: `documents/data/jsic-name-en.json`（再生成: `node scripts/extract-jsic-name-en.mjs` → `pnpm run build:jsic`）。
+- 欠落している細分類英名は捏造せず、UI は大分類 `name_en` へフォールバックする（51k セル再材化なし）。
+- 出典: 総務省 / e-Stat（日本語）および MIC English Structure Notes（英語）。
   一次資料 URL は `jsic.json` の `meta.source.urls` を参照。
 
 ## ライセンス / 出典 / 法務

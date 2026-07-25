@@ -69,6 +69,7 @@ export function CellDetail({
   const messages = messagesFor(locale);
   const labels = labelsByLocale[locale];
   const title = displayTitle(entry, locale);
+  const jsicLabel = facetDisplayLabel("jsic", entry.jsic, labels);
   const colorLabel = facetDisplayLabel("color", entry.color, labels);
   const moodLabel = facetDisplayLabel("mood", entry.mood, labels);
 
@@ -90,7 +91,12 @@ export function CellDetail({
           />
         </div>
         <p>
-          <span className="chip">{entry.jsic}</span>{" "}
+          <span
+            className="chip"
+            title={jsicLabel !== entry.jsic ? entry.jsic : undefined}
+          >
+            {jsicLabel}
+          </span>{" "}
           <span className="chip" title={entry.color}>
             {colorLabel}
           </span>{" "}
@@ -112,7 +118,12 @@ export function CellDetail({
           <dt>{messages.fieldDesignMd}</dt>
           <dd>{entry.path}</dd>
           <dt>{messages.fieldJsic}</dt>
-          <dd>{entry.jsic}</dd>
+          <dd>
+            {jsicLabel}
+            {jsicLabel !== entry.jsic ? (
+              <span className="code-hint"> ({entry.jsic})</span>
+            ) : null}
+          </dd>
           <dt>{messages.fieldColor}</dt>
           <dd>
             {colorLabel}
