@@ -12,10 +12,10 @@ const root = resolve(here, "..");
 process.env.GODD_PAGES_BUILD = "1";
 process.env.NEXT_PUBLIC_SITE_URL ??=
   "https://autodevjapan.github.io/GoDD-Design-Systems";
-// クライアントへは渡さないが、明示しておく（サーバ側ゲートと一致）。
 // output:export は空の generateStaticParams を拒否するため最低 1。全件は出さない。
 process.env.GODD_STATIC_CELL_LIMIT ??= "1";
 process.env.GODD_OG_CELL_LIMIT ??= "0";
+process.env.NEXT_TELEMETRY_DISABLED ??= "1";
 
 function run(cmd, args) {
   const r = spawnSync(cmd, args, {
@@ -24,7 +24,12 @@ function run(cmd, args) {
     env: process.env,
     shell: process.platform === "win32",
   });
+  if (r.error) {
+    console.error("[build-pages] spawn error:", r.error);
+    process.exit(1);
+  }
   if (r.status !== 0) {
+    console.error(`[build-pages] command failed: ${cmd} ${args.join(" ")} (status=${r.status})`);
     process.exit(r.status ?? 1);
   }
 }

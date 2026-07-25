@@ -51,14 +51,17 @@ export type IndexSummaryFile = {
   facets: Facets;
 };
 
-const repoRoot = process.cwd();
+/** Turbopack がリポジトリ全体を NFT トレースしないよう cwd を無視対象にする。 */
+function rootJoin(...parts: string[]): string {
+  return join(/* turbopackIgnore: true */ process.cwd(), ...parts);
+}
 
 /**
  * リポジトリルートの index.json を読み込む。
  * ビルド時 (SSG) にのみ呼ばれる Server 専用関数。
  */
 export function loadIndex(): IndexFile {
-  const raw = readFileSync(join(repoRoot, "index.json"), "utf8");
+  const raw = readFileSync(rootJoin("index.json"), "utf8");
   return JSON.parse(raw) as IndexFile;
 }
 
@@ -67,7 +70,7 @@ export function loadIndex(): IndexFile {
  * ファセットとページングメタのみ。ビルド時 (SSG) / サーバ専用。
  */
 export function loadIndexSummary(): IndexSummaryFile {
-  const raw = readFileSync(join(repoRoot, "index-summary.json"), "utf8");
+  const raw = readFileSync(rootJoin("index-summary.json"), "utf8");
   return JSON.parse(raw) as IndexSummaryFile;
 }
 
@@ -112,7 +115,10 @@ export type DesignSection = {
  * 現状のメタ表示にフォールバックする。ビルド時 (SSG) にのみ呼ばれる。
  */
 export function loadDesignSections(path: string): DesignSection[] | null {
-  const full = join(repoRoot, path);
+  // design-md/ 配下に限定（Turbopack がリポジトリ全体をマッチしないようにする）。
+  const relative = path.replace(/^[/\\]+/, "").replace(/\\/g, "/");
+  if (!relative.startsWith("design-md/")) return null;
+  const full = rootJoin(relative);
   if (!existsSync(full)) return null;
 
   const src = readFileSync(full, "utf8").replace(/\r\n/g, "\n");

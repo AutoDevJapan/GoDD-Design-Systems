@@ -49,6 +49,11 @@ jobs:
       - name: 依存インストール
         run: pnpm install --frozen-lockfile
 
+      # Pages はセル HTML を出さない。design-md 全件があると Turbopack NFT が
+      # 約 10 万ファイルをトレースしてビルドが落ちるため、ビルド前に除外する。
+      - name: design-md を除外 (Pages ビルド用)
+        run: rm -rf design-md
+
       - name: Pages 向けビルド (chrome + カタログ)
         run: pnpm run build:pages
         env:
@@ -56,6 +61,8 @@ jobs:
           GODD_STATIC_CELL_LIMIT: "1"
           GODD_OG_CELL_LIMIT: "0"
           NEXT_PUBLIC_SITE_URL: https://autodevjapan.github.io/GoDD-Design-Systems
+          NEXT_TELEMETRY_DISABLED: "1"
+          NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Pages artifact をアップロード
         uses: actions/upload-pages-artifact@v4

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { loadDesignSections, loadIndex, type Entry } from "@/lib/catalog";
-import { listStaticCellParams } from "@/lib/pages-build";
+import { isPagesBuild, listStaticCellParams } from "@/lib/pages-build";
 import { CellDetail } from "@/app/_components/cell-detail";
 import { taxonomyLabelsFor } from "@/lib/taxonomy-labels";
 import { displayTitle } from "@/lib/i18n";
@@ -80,7 +80,8 @@ export default async function CellPage({
   if (!entry) notFound();
 
   const index = loadIndex();
-  const sections = loadDesignSections(entry.path);
+  // Pages では本文を読まない（design-md 全件トレース / CI コスト回避。カタログは blob 誘導）。
+  const sections = isPagesBuild() ? null : loadDesignSections(entry.path);
 
   // 構造化データ (JSON-LD)。検索エンジンにセルの意味 (作品/データセット項目) を伝える。
   const jsonLd = {
