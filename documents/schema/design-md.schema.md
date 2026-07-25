@@ -51,7 +51,8 @@ generatedAt: "2026-07-11T00:00:00Z"
 | キー | 必須 | 型 / 規則 | 説明 |
 |---|---|---|---|
 | `id` | ✅ | `^[0-9]{4}_slug_slug$` | セルの安定 ID。`{jsic}_{color}_{mood}`。`index.json` の `entry.id` と一致。 |
-| `title` | ✅ | 1–200 文字 | 人間可読の見出し。`index.json` の `entry.title` と一致。 |
+| `title` | ✅ | 1–200 文字 | 人間可読の見出し（日本語）。`index.json` の `entry.title` と一致。 |
+| `titleEn` | 任意 | 1–200 文字 | 英語見出し。未設定時は UI が `title` へフォールバック（Issue #25 / ADR-0002）。設定時は `index.json` の `entry.titleEn` と一致。 |
 | `jsic` | ✅ | `^[0-9]{4}$` | JSIC 細分類コード。出典 `jsic.json`。 |
 | `color` | ✅ | slug (`taxonomy.md §1`) | カラー軸の値。 |
 | `mood` | ✅ | slug (`taxonomy.md §2`) | ムード軸の値。 |

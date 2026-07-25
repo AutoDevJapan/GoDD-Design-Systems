@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { SkipLink } from "@/app/_components/skip-link";
+import { messagesFor, SITE_LANGUAGE_ALTERNATES } from "@/lib/i18n";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
+
+const defaultMessages = messagesFor("ja");
 
 export const metadata: Metadata = {
   // 相対 URL (canonical / OGP) を絶対化する基準。SEO の要。
@@ -9,16 +13,16 @@ export const metadata: Metadata = {
     default: SITE_NAME,
     template: `%s — ${SITE_NAME}`,
   },
-  description: SITE_DESCRIPTION,
-  alternates: { canonical: "/" },
+  description: defaultMessages.siteDescription,
+  alternates: {
+    languages: SITE_LANGUAGE_ALTERNATES,
+  },
   openGraph: {
     title: SITE_NAME,
-    description:
-      "業種 × カラー × ムードで整理した、AI が読む DESIGN.md のオープンカタログ。",
+    description: defaultMessages.ogDescription,
     type: "website",
     siteName: SITE_NAME,
     locale: "ja_JP",
-    url: "/",
     // ビルド時に scripts/build-og.mjs が生成する OG 画像 (public/og/home.png)。
     // metadataBase により絶対 URL 化される。
     images: [{ url: "/og/home.png", width: 1200, height: 630, alt: SITE_NAME }],
@@ -26,8 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: SITE_NAME,
-    description:
-      "業種 × カラー × ムードで整理した、AI が読む DESIGN.md のオープンカタログ。",
+    description: defaultMessages.ogDescription,
     images: ["/og/home.png"],
   },
 };
@@ -41,9 +44,7 @@ export default function RootLayout({
     <html lang="ja">
       <body>
         {/* キーボード / スクリーンリーダ利用者が反復コンテンツを飛ばして本文へ */}
-        <a className="skip-link" href="#main-content">
-          本文へスキップ
-        </a>
+        <SkipLink />
         {children}
       </body>
     </html>

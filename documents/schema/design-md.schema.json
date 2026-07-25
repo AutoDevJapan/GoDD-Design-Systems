@@ -21,7 +21,13 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 200,
-      "description": "人間可読の見出し。index.json の entry.title と一致する。"
+      "description": "人間可読の見出し（日本語）。index.json の entry.title と一致する。"
+    },
+    "titleEn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "任意。人間可読の英語見出し。未設定時は UI が title（ja）へフォールバックする（Issue #25 / ADR-0002）。index.json の entry.titleEn と一致すること。"
     },
     "jsic": {
       "type": "string",

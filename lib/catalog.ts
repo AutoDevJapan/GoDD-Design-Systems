@@ -17,6 +17,8 @@ export type Entry = {
   mood: string;
   tags: string[];
   title: string;
+  /** 任意。英語見出し（Issue #25）。未設定時は title へフォールバック。 */
+  titleEn?: string;
   hash: string;
   createdAt: string;
   updatedAt?: string;

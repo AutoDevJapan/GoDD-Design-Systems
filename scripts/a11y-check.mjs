@@ -43,8 +43,15 @@ function want(file, src, needle, label) {
 // --- layout: lang / スキップリンク -------------------------------------------
 const layout = read("app/layout.tsx");
 want("app/layout.tsx", layout, 'lang="ja"', 'lang="ja" 属性');
-want("app/layout.tsx", layout, "skip-link", "スキップリンク (.skip-link)");
-want("app/layout.tsx", layout, 'href="#main-content"', "スキップリンクの遷移先 #main-content");
+want("app/layout.tsx", layout, "SkipLink", "スキップリンク (SkipLink)");
+const skipLink = read("app/_components/skip-link.tsx");
+want("app/_components/skip-link.tsx", skipLink, "skip-link", "スキップリンク (.skip-link)");
+want(
+  "app/_components/skip-link.tsx",
+  skipLink,
+  'href="#main-content"',
+  "スキップリンクの遷移先 #main-content",
+);
 
 // --- globals.css: focus / motion / contrast token ----------------------------
 const css = read("app/globals.css");
@@ -58,7 +65,11 @@ if (/\.chip-btn\.is-selected[^}]*rgba\(255,\s*255,\s*255/s.test(css)) {
 }
 
 // --- ページ: main / header / footer ランドマーク ------------------------------
-for (const page of ["app/page.tsx", "app/cells/[id]/page.tsx"]) {
+for (const page of [
+  "app/page.tsx",
+  "app/en/page.tsx",
+  "app/cells/[id]/page.tsx",
+]) {
   const src = read(page);
   const mains = src.match(/<main[\s>]/g) ?? [];
   if (mains.length !== 1) fail(page, `main ランドマークが 1 つであること (実際: ${mains.length})`);

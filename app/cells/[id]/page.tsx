@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { loadDesignSections, loadIndex, type Entry } from "@/lib/catalog";
 import { SiteFooter } from "@/app/_components/site-footer";
+import { messagesFor } from "@/lib/i18n";
 import { SITE_NAME, absoluteUrl } from "@/lib/site";
 
 /** セルの検索用 description（業種 × カラー × ムード + タグ）。 */
@@ -156,7 +157,10 @@ export default async function CellPage({
       )}
       </main>
 
-      <SiteFooter generatedAt={index.generatedAt} />
+      <SiteFooter
+        generatedAt={index.generatedAt}
+        messages={messagesFor("ja")}
+      />
     </div>
   );
 }
