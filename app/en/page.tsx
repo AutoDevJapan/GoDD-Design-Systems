@@ -8,6 +8,7 @@ import {
   type CatalogCell,
 } from "@/app/_components/catalog-explorer";
 import { messagesFor, SITE_LANGUAGE_ALTERNATES } from "@/lib/i18n";
+import { taxonomyLabelsFor } from "@/lib/taxonomy-labels";
 import { SITE_NAME } from "@/lib/site";
 
 const locale = "en" as const;
@@ -38,19 +39,22 @@ export const metadata: Metadata = {
 };
 
 /**
- * 英語ホーム（Issue #25 / ADR-0002 Phase 0）。
- * カタログ UI chrome のみ英訳。セル title / DESIGN.md 本文は日本語のまま。
+ * 英語ホーム（Issue #25 / ADR-0002）。
+ * カタログ chrome + taxonomy name_en ファセット。セル本文は日本語のまま。
+ * セル詳細へは `?lang=en` 付きで遷移（二重静的生成しない）。
  */
 export default function EnglishHomePage() {
   const index = loadIndex();
   const cells: CatalogCell[] = index.entries.map((e) => ({
     id: e.id,
     title: e.title,
+    titleEn: e.titleEn,
     jsic: e.jsic,
     color: e.color,
     mood: e.mood,
     tags: e.tags,
   }));
+  const taxonomyLabels = taxonomyLabelsFor(locale);
 
   return (
     <div className="wrap">
@@ -67,7 +71,12 @@ export default function EnglishHomePage() {
       </header>
 
       <main id="main-content" tabIndex={-1}>
-        <CatalogExplorer cells={cells} messages={messages} />
+        <CatalogExplorer
+          cells={cells}
+          messages={messages}
+          locale={locale}
+          taxonomyLabels={taxonomyLabels}
+        />
       </main>
 
       <SiteFooter generatedAt={index.generatedAt} messages={messages} />

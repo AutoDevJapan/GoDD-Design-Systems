@@ -65,10 +65,12 @@ if (/\.chip-btn\.is-selected[^}]*rgba\(255,\s*255,\s*255/s.test(css)) {
 }
 
 // --- ページ: main / header / footer ランドマーク ------------------------------
+// セル詳細のランドマークは Client chrome (`cell-detail.tsx`) 側にある
+// （`?lang=en` 切替のため。page.tsx は JSON-LD + 委譲のみ）。
 for (const page of [
   "app/page.tsx",
   "app/en/page.tsx",
-  "app/cells/[id]/page.tsx",
+  "app/_components/cell-detail.tsx",
 ]) {
   const src = read(page);
   const mains = src.match(/<main[\s>]/g) ?? [];

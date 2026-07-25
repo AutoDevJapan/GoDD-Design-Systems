@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { loadDesignSections, loadIndex, type Entry } from "@/lib/catalog";
-import { SiteFooter } from "@/app/_components/site-footer";
-import { messagesFor } from "@/lib/i18n";
+import { CellDetail } from "@/app/_components/cell-detail";
+import { taxonomyLabelsFor } from "@/lib/taxonomy-labels";
+import { displayTitle } from "@/lib/i18n";
 import { SITE_NAME, absoluteUrl } from "@/lib/site";
 
-/** セルの検索用 description（業種 × カラー × ムード + タグ）。 */
+/** セルの検索用 description（業種 × カラー × ムード + タグ）。メタは既定 ja。 */
 function cellDescription(entry: Entry): string {
   const tags = entry.tags.length > 0 ? `。タグ: ${entry.tags.join(", ")}` : "";
   return `業種 (JSIC) ${entry.jsic} × カラー ${entry.color} × ムード ${entry.mood} の DESIGN.md。AI がそのまま読んで一貫した UI を生成できるオープンカタログのセル${tags}。`;
@@ -35,16 +35,17 @@ export async function generateMetadata({
 
   const canonical = `/cells/${entry.id}/`;
   const description = cellDescription(entry);
+  const title = displayTitle(entry, "ja");
   // ビルド時に scripts/build-og.mjs が各セルのトークン (カラー/ムード/業種) を
   // 反映して生成する OG 画像 (public/og/{id}.png)。metadataBase で絶対 URL 化。
   const ogImage = `/og/${entry.id}.png`;
-  const ogAlt = `${entry.title}（業種 ${entry.jsic} × カラー ${entry.color} × ムード ${entry.mood}）`;
+  const ogAlt = `${title}（業種 ${entry.jsic} × カラー ${entry.color} × ムード ${entry.mood}）`;
   return {
-    title: entry.title,
+    title,
     description,
     alternates: { canonical },
     openGraph: {
-      title: `${entry.title} — ${SITE_NAME}`,
+      title: `${title} — ${SITE_NAME}`,
       description,
       type: "article",
       siteName: SITE_NAME,
@@ -54,13 +55,17 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${entry.title} — ${SITE_NAME}`,
+      title: `${title} — ${SITE_NAME}`,
       description,
       images: [ogImage],
     },
   };
 }
 
+/**
+ * セル詳細。ロケール二重静的生成は行わない（ADR-0002）。
+ * chrome EN はクライアントで `?lang=en` を解釈する（Phase 1）。
+ */
 export default async function CellPage({
   params,
 }: {
@@ -89,78 +94,32 @@ export default async function CellPage({
     dateModified: entry.updatedAt ?? entry.createdAt,
   };
 
-  // ランドマーク整理: nav(パンくず) / header(banner) / main / footer(contentinfo)
-  // を .wrap 直下の兄弟に配置する。
   return (
-    <div className="wrap detail">
+    <>
       <script
         type="application/ld+json"
-        // ビルド時に信頼済みの自リポジトリ由来メタのみを埋め込む。
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <nav className="back-nav" aria-label="パンくず">
-        <Link className="back" href="/">
-          ← カタログへ戻る
-        </Link>
-      </nav>
-      <header className="site-header">
-        <h1>{entry.title}</h1>
-        <p>
-          <span className="chip">{entry.jsic}</span>{" "}
-          <span className="chip">{entry.color}</span>{" "}
-          <span className="chip">{entry.mood}</span>
-        </p>
-      </header>
-
-      <main id="main-content" tabIndex={-1}>
-      <dl>
-        <dt>id</dt>
-        <dd>{entry.id}</dd>
-        <dt>DESIGN.md</dt>
-        <dd>{entry.path}</dd>
-        <dt>業種 (JSIC)</dt>
-        <dd>{entry.jsic}</dd>
-        <dt>カラー</dt>
-        <dd>{entry.color}</dd>
-        <dt>ムード</dt>
-        <dd>{entry.mood}</dd>
-        <dt>タグ</dt>
-        <dd>{entry.tags.join(", ")}</dd>
-        <dt>hash</dt>
-        <dd>{entry.hash}</dd>
-        <dt>createdAt</dt>
-        <dd>{entry.createdAt}</dd>
-      </dl>
-
-      {sections ? (
-        <section className="design" aria-labelledby="design-heading">
-          <h2 id="design-heading" className="design-title">
-            DESIGN.md 本文
-          </h2>
-          {sections.map((s) => (
-            <article className="design-section" key={s.id} id={s.id}>
-              <h3>
-                {s.ja} <span className="section-id">/ {s.id}</span>
-              </h3>
-              {/* 本文はビルド時に信頼済みの自リポジトリ Markdown を HTML 化したもの。 */}
-              <div
-                className="design-body"
-                dangerouslySetInnerHTML={{ __html: s.html }}
-              />
-            </article>
-          ))}
-        </section>
-      ) : (
-        <p className="design-empty">
-          このセルはまだ DESIGN.md 本文が材化されていません（上記パスを参照）。
-        </p>
-      )}
-      </main>
-
-      <SiteFooter
+      <CellDetail
+        entry={{
+          id: entry.id,
+          path: entry.path,
+          jsic: entry.jsic,
+          color: entry.color,
+          mood: entry.mood,
+          tags: entry.tags,
+          title: entry.title,
+          titleEn: entry.titleEn,
+          hash: entry.hash,
+          createdAt: entry.createdAt,
+        }}
+        sections={sections}
         generatedAt={index.generatedAt}
-        messages={messagesFor("ja")}
+        labelsByLocale={{
+          ja: taxonomyLabelsFor("ja"),
+          en: taxonomyLabelsFor("en"),
+        }}
       />
-    </div>
+    </>
   );
 }

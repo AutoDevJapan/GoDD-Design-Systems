@@ -13,8 +13,8 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | パス | 役割 |
 |---|---|
 | `taxonomy.md` | `color` / `mood` の分類語彙 (SSOT, 人間可読) |
-| `taxonomy.json` | `color` / `mood` slug → 日本語ラベルの機械可読契約 (スキーマ: `documents/schema/taxonomy.schema.json`)。下流 (Matrix Pages) が raw URL から実行時 fetch し、ファセットラベルを日本語化する |
-| `jsic.json` | 業種軸 (日本標準産業分類 / JSIC) の code→名称→定義 (スキーマ: `documents/schema/jsic.schema.json`) |
+| `taxonomy.json` | `color` / `mood` slug → `name_ja` / `name_en` の機械可読契約 (スキーマ: `documents/schema/taxonomy.schema.json`)。サイトはロケールに応じてファセット表示へ接続 |
+| `jsic.json` | 業種軸 (日本標準産業分類 / JSIC) の code→名称→定義 (スキーマ: `documents/schema/jsic.schema.json`)。英名 (`name_en`) は未整備 |
 | `index.json` | 材化済みセルのメタデータ SSOT (スキーマ: `documents/schema/index.schema.json`) |
 | `index-summary.json` | 軽量サマリ（件数・`pageSize=1000`・ファセット）。消費者は明細より先に取得する (Issue #43 / ADR-0001) |
 | `index/pages/{n}.json` | 任意生成のページシャード（0-based）。**git にはコミットしない**。公開は Release タグ `index-pages`（ADR-0003） |
@@ -23,7 +23,9 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | `documents/adr/0002-i18n-english-copresence.md` | 英語併記の段階導入（UI chrome 先行・コーパス非一括翻訳） |
 | `documents/adr/0003-index-pages-release-publish.md` | pages を Release asset で公開する決定 |
 | `app/en/` | 英語ホーム（サイト chrome 英訳。セル本文は日本語のまま） |
+| `app/cells/[id]/` | セル詳細（単一路線。chrome EN は `?lang=en`。`/en/cells/` は置かない） |
 | `lib/i18n.ts` | サイト chrome 向け JA/EN メッセージ |
+| `lib/taxonomy-labels.ts` | taxonomy `name_ja` / `name_en` → ファセット表示ラベル |
 | `scripts/validate-index-pages.mjs` | 生成済み pages の契約検証（未生成時は SKIP） |
 | `scripts/package-index-pages.mjs` | Release 用ステージング（manifest + 個別 JSON） |
 | `.github/workflows/publish-index-pages.yml` | `workflow_dispatch` のみで pages を Release 公開 |

@@ -2,12 +2,23 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { fillTemplate, type UiMessages } from "@/lib/i18n";
+import {
+  cellPath,
+  displayTitle,
+  fillTemplate,
+  type Locale,
+  type UiMessages,
+} from "@/lib/i18n";
+import {
+  facetDisplayLabel,
+  type TaxonomyLabelMaps,
+} from "@/lib/taxonomy-labels";
 
 /** ブラウズに必要な最小のセル情報（軽量インデックス）。ビルド時に埋め込む。 */
 export type CatalogCell = {
   id: string;
   title: string;
+  titleEn?: string;
   jsic: string;
   color: string;
   mood: string;
@@ -49,11 +60,28 @@ function axisMatches(cell: CatalogCell, axis: Axis, selected: Set<string>): bool
   return axisValues(cell, axis).some((v) => selected.has(v));
 }
 
-/** キーワード検索の一致判定（タイトル / id / 各軸値の部分一致・大文字小文字無視）。 */
-function queryMatches(cell: CatalogCell, q: string): boolean {
+/** キーワード検索の一致判定（タイトル / id / 各軸値・表示ラベルの部分一致）。 */
+function queryMatches(
+  cell: CatalogCell,
+  q: string,
+  locale: Locale,
+  labels: TaxonomyLabelMaps,
+): boolean {
   if (!q) return true;
   const needle = q.toLowerCase();
-  const haystacks = [cell.title, cell.id, cell.jsic, cell.color, cell.mood, ...cell.tags];
+  const title = displayTitle(cell, locale);
+  const haystacks = [
+    title,
+    cell.title,
+    cell.titleEn ?? "",
+    cell.id,
+    cell.jsic,
+    cell.color,
+    cell.mood,
+    facetDisplayLabel("color", cell.color, labels),
+    facetDisplayLabel("mood", cell.mood, labels),
+    ...cell.tags,
+  ];
   return haystacks.some((h) => h.toLowerCase().includes(needle));
 }
 
@@ -67,12 +95,14 @@ function matchesExcept(
   selected: Selected,
   query: string,
   exceptAxis: Axis | null,
+  locale: Locale,
+  labels: TaxonomyLabelMaps,
 ): boolean {
   for (const key of AXIS_KEYS) {
     if (key === exceptAxis) continue;
     if (!axisMatches(cell, key, selected[key])) return false;
   }
-  return queryMatches(cell, query);
+  return queryMatches(cell, query, locale, labels);
 }
 
 // --- URL クエリ同期（静的エクスポートと両立するため History API を直接使う） ---
@@ -107,9 +137,13 @@ function buildSearch(selected: Selected, query: string): string {
 export function CatalogExplorer({
   cells,
   messages,
+  locale,
+  taxonomyLabels,
 }: {
   cells: CatalogCell[];
   messages: UiMessages;
+  locale: Locale;
+  taxonomyLabels: TaxonomyLabelMaps;
 }) {
   const labels = axisLabels(messages);
   const [selected, setSelected] = useState<Selected>(emptySelected);
@@ -158,8 +192,11 @@ export function CatalogExplorer({
 
   // 絞り込み後のセル一覧。
   const filtered = useMemo(
-    () => cells.filter((c) => matchesExcept(c, selected, query, null)),
-    [cells, selected, query],
+    () =>
+      cells.filter((c) =>
+        matchesExcept(c, selected, query, null, locale, taxonomyLabels),
+      ),
+    [cells, selected, query, locale, taxonomyLabels],
   );
 
   // 軸ごとのファセット候補と、他軸フィルタを反映した残件数。
@@ -181,7 +218,9 @@ export function CatalogExplorer({
       }
       // 他軸フィルタ + 検索を満たすセルで件数を数える。
       for (const cell of cells) {
-        if (!matchesExcept(cell, selected, query, key)) continue;
+        if (!matchesExcept(cell, selected, query, key, locale, taxonomyLabels)) {
+          continue;
+        }
         for (const v of new Set(axisValues(cell, key))) {
           counts.set(v, (counts.get(v) ?? 0) + 1);
         }
@@ -191,7 +230,7 @@ export function CatalogExplorer({
         .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
     }
     return result;
-  }, [cells, selected, query]);
+  }, [cells, selected, query, locale, taxonomyLabels]);
 
   return (
     <>
@@ -218,6 +257,7 @@ export function CatalogExplorer({
                   {facets[key].map((f) => {
                     const isSelected = selected[key].has(f.value);
                     const disabled = f.count === 0 && !isSelected;
+                    const display = facetDisplayLabel(key, f.value, taxonomyLabels);
                     return (
                       <button
                         type="button"
@@ -226,13 +266,14 @@ export function CatalogExplorer({
                         aria-pressed={isSelected}
                         aria-label={fillTemplate(messages.chipAriaTemplate, {
                           label,
-                          value: f.value,
+                          value: display,
                           count: f.count,
                         })}
+                        title={display !== f.value ? f.value : undefined}
                         disabled={disabled}
                         onClick={() => toggle(key, f.value)}
                       >
-                        {f.value}
+                        {display}
                         <span className="count">{f.count}</span>
                       </button>
                     );
@@ -282,13 +323,23 @@ export function CatalogExplorer({
               <Link
                 className="card"
                 key={entry.id}
-                href={`/cells/${entry.id}/`}
+                href={cellPath(entry.id, locale)}
               >
-                <p className="title">{entry.title}</p>
+                <p className="title">{displayTitle(entry, locale)}</p>
                 <div className="meta">
                   <span className="chip">{entry.jsic}</span>
-                  <span className="chip">{entry.color}</span>
-                  <span className="chip">{entry.mood}</span>
+                  <span
+                    className="chip"
+                    title={entry.color}
+                  >
+                    {facetDisplayLabel("color", entry.color, taxonomyLabels)}
+                  </span>
+                  <span
+                    className="chip"
+                    title={entry.mood}
+                  >
+                    {facetDisplayLabel("mood", entry.mood, taxonomyLabels)}
+                  </span>
                 </div>
                 <div className="tags">{entry.tags.join(" · ")}</div>
                 <div className="id">{entry.id}</div>
