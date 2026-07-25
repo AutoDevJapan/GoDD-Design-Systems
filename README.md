@@ -22,6 +22,7 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | `documents/adr/0001-index-summary-paging.md` | summary 先行配信の決定記録 |
 | `documents/adr/0002-i18n-english-copresence.md` | 英語併記の段階導入（UI chrome 先行・コーパス非一括翻訳） |
 | `documents/adr/0003-index-pages-release-publish.md` | pages を Release asset で公開する決定 |
+| `documents/adr/0004-github-pages-browse-hosting.md` | 公開ブラウズ UI を GitHub Pages（Actions）でホストする決定 |
 | `app/en/` | 英語ホーム（サイト chrome 英訳。セル本文は日本語のまま） |
 | `app/cells/[id]/` | セル詳細（単一路線。chrome EN は `?lang=en`。`/en/cells/` は置かない） |
 | `lib/i18n.ts` | サイト chrome 向け JA/EN メッセージ |
@@ -29,6 +30,8 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | `scripts/validate-index-pages.mjs` | 生成済み pages の契約検証（未生成時は SKIP） |
 | `scripts/package-index-pages.mjs` | Release 用ステージング（manifest + 個別 JSON） |
 | `.github/workflows/publish-index-pages.yml` | `workflow_dispatch` のみで pages を Release 公開 |
+| `.github/workflows/deploy-pages.yml` | 公開ブラウズ UI を GitHub Pages へデプロイ（path-filtered） |
+| `scripts/build-pages.mjs` / `pnpm build:pages` | Pages 向け静的エクスポート（chrome + カタログ。セル HTML 全件は出さない） |
 | `design-md/{jsic}/{color}/{mood}/DESIGN.md` | 材化済みセル本体 (形式: `documents/schema/design-md.schema.md`) |
 | `documents/schema/design-md.schema.json` | DESIGN.md frontmatter の JSON Schema |
 | `scripts/validate-index.mjs` | `index.json` をスキーマ + 整合性検証 (CI) |
@@ -51,6 +54,7 @@ Node.js >= 22 / pnpm >= 10。
 pnpm install
 pnpm dev        # サイトをローカル起動 (http://localhost:3000)
 pnpm build      # OG 画像生成 (build:og) + 静的サイトを out/ へ書き出し (next build, output: export)
+pnpm build:pages # GitHub Pages 向け (basePath 付き。セル HTML / セル OG は既定スキップ)
 pnpm build:og   # OGP/Twitter 画像のみ再生成 → public/og/*.png (トークン変更時。決定的・コミット対象)
 pnpm validate   # index.json / index-summary.json / DESIGN.md / jsic.json / taxonomy.json + 法務チェックを検証 (CI と同一)
 pnpm build:index-summary  # index.json 更新後に summary を再生成（材化と同コミットで同期）
@@ -68,19 +72,23 @@ pnpm legal:check # de-brand / オープン書体 / 出典表示のみを個別�
 pages の再公開は Actions「Publish index pages」を手動実行する（PR ごとには走らない）。
 `index.json` 全件取得はレガシーフォールバックとして残すが推奨しない。
 
-## デプロイ (Vercel / 4 環境)
+## デプロイ (GitHub Pages)
 
-GitHub Actions (`.github/workflows/deploy.yml`) から Vercel へデプロイする。
+公開ブラウズ UI は **GitHub Pages** で配信する（ADR-0004 / Issue #66）。
 
-| 環境 | トリガ | 内容 |
-|---|---|---|
-| preview | PR | プレビューをデプロイし URL を PR にコメント |
-| dev | `main` への push | dev エイリアスへデプロイ |
-| stg | 手動 (`workflow_dispatch`, environment=stg) | staging へ昇格 |
-| prd | 手動 (`workflow_dispatch`, environment=prd) | 本番。GitHub `production` 環境の承認ゲート付き |
+| 項目 | 内容 |
+|---|---|
+| URL | https://autodevjapan.github.io/GoDD-Design-Systems/ （英語 chrome: `/en/`） |
+| ワークフロー | `.github/workflows/deploy-pages.yml` |
+| トリガ | `main` への path-filtered push（`app/` `lib/` `public/` 等） / `workflow_dispatch` |
+| ビルド | `pnpm run build:pages`（`GODD_PAGES_BUILD=1` + `basePath=/GoDD-Design-Systems`） |
+| 成果物 | サイト chrome（`/`・`/en/`）。カタログは raw `index.json` をブラウザで取得。セル HTML は **サンプル 1 件のみ** |
+| セル本文 | カタログカードは `design-md/.../DESIGN.md` の GitHub blob へリンク |
 
-秘密情報 (`VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID`) は
-GitHub Actions Secrets で管理し、リポジトリにはコミットしない。
+Pages のソースは **GitHub Actions**（リポジトリ Settings → Pages → Build and deployment）。
+組織ポリシーで API からの有効化が拒否される場合は、初回だけ UI で Actions ソースを選ぶ。
+
+`index/pages` シャードの公開は本デプロイとは別（ADR-0003 / Release タグ `index-pages`）。
 
 ## 業種軸 (JSIC) の収録状況
 

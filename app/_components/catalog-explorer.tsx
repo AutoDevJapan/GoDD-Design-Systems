@@ -13,6 +13,7 @@ import {
   facetDisplayLabel,
   type TaxonomyLabelMaps,
 } from "@/lib/taxonomy-labels";
+import { githubBlobUrl } from "@/lib/site-urls";
 
 /** ブラウズに必要な最小のセル情報（軽量インデックス）。ビルド時に埋め込む。 */
 export type CatalogCell = {
@@ -23,6 +24,11 @@ export type CatalogCell = {
   color: string;
   mood: string;
   tags: string[];
+  /**
+   * 詳細への明示 href。未設定時は `cellPath(id, locale)`。
+   * Pages remote 取得時は GitHub blob URL。
+   */
+  href?: string;
 };
 
 /** 絞り込みの対象となる分類軸。 */
@@ -134,20 +140,71 @@ function buildSearch(selected: Selected, query: string): string {
   return s ? `?${s}` : "";
 }
 
+type RemoteIndexEntry = {
+  id: string;
+  title: string;
+  titleEn?: string;
+  jsic: string;
+  color: string;
+  mood: string;
+  tags?: string[];
+  path: string;
+};
+
 export function CatalogExplorer({
-  cells,
+  cells: initialCells,
   messages,
   locale,
   taxonomyLabels,
+  remoteIndexUrl,
 }: {
   cells: CatalogCell[];
   messages: UiMessages;
   locale: Locale;
   taxonomyLabels: TaxonomyLabelMaps;
+  /** 指定時はマウント後に remote index.json を fetch（Pages 軽量化）。 */
+  remoteIndexUrl?: string;
 }) {
   const labels = axisLabels(messages);
+  const [cells, setCells] = useState<CatalogCell[]>(initialCells);
+  const [remoteStatus, setRemoteStatus] = useState<
+    "idle" | "loading" | "ready" | "error"
+  >(remoteIndexUrl ? "loading" : "idle");
   const [selected, setSelected] = useState<Selected>(emptySelected);
   const [query, setQuery] = useState("");
+
+  // Pages: raw index.json をクライアント取得（静的 HTML 肥大化を避ける）。
+  useEffect(() => {
+    if (!remoteIndexUrl) return;
+    let cancelled = false;
+    setRemoteStatus("loading");
+    (async () => {
+      try {
+        const res = await fetch(remoteIndexUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = (await res.json()) as { entries: RemoteIndexEntry[] };
+        if (cancelled) return;
+        setCells(
+          data.entries.map((e) => ({
+            id: e.id,
+            title: e.title,
+            titleEn: e.titleEn,
+            jsic: e.jsic,
+            color: e.color,
+            mood: e.mood,
+            tags: e.tags ?? [],
+            href: githubBlobUrl(e.path),
+          })),
+        );
+        setRemoteStatus("ready");
+      } catch {
+        if (!cancelled) setRemoteStatus("error");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [remoteIndexUrl]);
 
   // マウント後に URL クエリから初期状態を復元（共有リンクの反映）。
   // 初回レンダは無フィルタ（= サーバ生成 HTML と一致）にしてハイドレーション不整合を避ける。
@@ -287,6 +344,16 @@ export function CatalogExplorer({
 
       <section className="section" aria-labelledby="cells-heading">
         <h2 id="cells-heading">{messages.catalogHeading}</h2>
+        {remoteStatus === "loading" ? (
+          <p className="empty" role="status">
+            {messages.catalogLoading}
+          </p>
+        ) : null}
+        {remoteStatus === "error" ? (
+          <p className="empty" role="alert">
+            {messages.catalogLoadError}
+          </p>
+        ) : null}
         <div className="toolbar">
           <div className="search">
             <label htmlFor="cell-search" className="search-label">
@@ -319,34 +386,43 @@ export function CatalogExplorer({
 
         {filtered.length > 0 ? (
           <div className="cards">
-            {filtered.map((entry) => (
-              <Link
-                className="card"
-                key={entry.id}
-                href={cellPath(entry.id, locale)}
-              >
-                <p className="title">{displayTitle(entry, locale)}</p>
-                <div className="meta">
-                  <span className="chip">{entry.jsic}</span>
-                  <span
-                    className="chip"
-                    title={entry.color}
-                  >
-                    {facetDisplayLabel("color", entry.color, taxonomyLabels)}
-                  </span>
-                  <span
-                    className="chip"
-                    title={entry.mood}
-                  >
-                    {facetDisplayLabel("mood", entry.mood, taxonomyLabels)}
-                  </span>
-                </div>
-                <div className="tags">{entry.tags.join(" · ")}</div>
-                <div className="id">{entry.id}</div>
-              </Link>
-            ))}
+            {filtered.map((entry) => {
+              const href = entry.href ?? cellPath(entry.id, locale);
+              const external = /^https?:\/\//i.test(href);
+              const body = (
+                <>
+                  <p className="title">{displayTitle(entry, locale)}</p>
+                  <div className="meta">
+                    <span className="chip">{entry.jsic}</span>
+                    <span className="chip" title={entry.color}>
+                      {facetDisplayLabel("color", entry.color, taxonomyLabels)}
+                    </span>
+                    <span className="chip" title={entry.mood}>
+                      {facetDisplayLabel("mood", entry.mood, taxonomyLabels)}
+                    </span>
+                  </div>
+                  <div className="tags">{entry.tags.join(" · ")}</div>
+                  <div className="id">{entry.id}</div>
+                </>
+              );
+              return external ? (
+                <a
+                  className="card"
+                  key={entry.id}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {body}
+                </a>
+              ) : (
+                <Link className="card" key={entry.id} href={href}>
+                  {body}
+                </Link>
+              );
+            })}
           </div>
-        ) : (
+        ) : remoteStatus === "loading" || remoteStatus === "error" ? null : (
           <p className="empty" role="status">
             {messages.emptyResults}
             <button type="button" className="clear-btn inline" onClick={clearAll}>

@@ -85,6 +85,10 @@ export type UiMessages = {
   fieldCreatedAt: string;
   designHeading: string;
   designEmpty: string;
+  /** Pages remote カタログ読込中。 */
+  catalogLoading: string;
+  /** Pages remote カタログ読込失敗。 */
+  catalogLoadError: string;
 };
 
 const ja: UiMessages = {
@@ -132,6 +136,9 @@ const ja: UiMessages = {
   designHeading: "DESIGN.md 本文",
   designEmpty:
     "このセルはまだ DESIGN.md 本文が材化されていません（上記パスを参照）。",
+  catalogLoading: "カタログを読み込んでいます…",
+  catalogLoadError:
+    "カタログの読み込みに失敗しました。しばらくしてから再読み込みしてください。",
 };
 
 const en: UiMessages = {
@@ -179,6 +186,8 @@ const en: UiMessages = {
   designHeading: "DESIGN.md body",
   designEmpty:
     "This cell has no materialized DESIGN.md body yet (see the path above).",
+  catalogLoading: "Loading catalog…",
+  catalogLoadError: "Failed to load the catalog. Please reload and try again.",
 };
 
 const MESSAGES: Record<Locale, UiMessages> = { ja, en };

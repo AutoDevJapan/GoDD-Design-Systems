@@ -397,7 +397,21 @@ async function main() {
   total += homeBytes;
   console.log(`[build-og] home.png (${homeBytes} B)`);
 
-  for (const entry of index.entries) {
+  // Pages ビルド等では GODD_OG_CELL_LIMIT（既定 0）でセル OG を抑える（ADR-0004）。
+  // 未設定時は従来どおり全エントリ。
+  const pagesBuild = process.env.GODD_PAGES_BUILD === "1";
+  const limitRaw = process.env.GODD_OG_CELL_LIMIT;
+  let cellEntries = index.entries;
+  if (pagesBuild || limitRaw !== undefined) {
+    const limit =
+      limitRaw !== undefined ? Number(limitRaw) : pagesBuild ? 0 : cellEntries.length;
+    cellEntries =
+      Number.isFinite(limit) && limit >= 0
+        ? cellEntries.slice(0, limit)
+        : [];
+  }
+
+  for (const entry of cellEntries) {
     const pal = extractPalette(entry);
     const bytes = await render(CellCard(entry, pal), join(outDir, `${entry.id}.png`));
     total += bytes;
@@ -405,7 +419,8 @@ async function main() {
   }
 
   console.log(
-    `[build-og] OK: ${index.entries.length + 1} 枚生成 (計 ${(total / 1024).toFixed(1)} KB) → public/og/`
+    `[build-og] OK: ${cellEntries.length + 1} 枚生成 (計 ${(total / 1024).toFixed(1)} KB) → public/og/` +
+      (pagesBuild ? " [pages: home-only unless GODD_OG_CELL_LIMIT]" : ""),
   );
 }
 
