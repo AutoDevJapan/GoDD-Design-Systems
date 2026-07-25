@@ -29,6 +29,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "..");
 const dataPath = resolve(root, "jsic.json");
 const sourcePath = resolve(root, "documents/data/jsic-source.json");
+const nameEnPath = resolve(root, "documents/data/jsic-name-en.json");
 const checkMode = process.argv.includes("--check");
 
 function readJson(path) {
@@ -55,6 +56,45 @@ if (existsSync(sourcePath)) {
   console.log(`[build-jsic] 外部ソースをマージ: ${sourcePath}`);
 }
 
+/**
+ * 公式英語ラベル (MIC Rev.14 English Structure Notes) を name_en として付与。
+ * コーパス再材化は不要。欠落コードには name_en を捏造しない。
+ */
+function applyNameEn(items, enByCode) {
+  if (!Array.isArray(items) || !enByCode || typeof enByCode !== "object") return 0;
+  let applied = 0;
+  for (const it of items) {
+    const nameEn = enByCode[it.code];
+    if (typeof nameEn === "string" && nameEn.trim().length > 0) {
+      it.name_en = nameEn.trim();
+      applied += 1;
+    } else {
+      delete it.name_en;
+    }
+  }
+  return applied;
+}
+
+let nameEnApplied = null;
+if (existsSync(nameEnPath)) {
+  const en = readJson(nameEnPath);
+  nameEnApplied = {
+    major: applyNameEn(data.major, en.major),
+    middle: applyNameEn(data.middle, en.middle),
+    minor: applyNameEn(data.minor, en.minor),
+    subclass: applyNameEn(data.subclass, en.subclass),
+  };
+  const enUrls = Array.isArray(en?.meta?.source?.urls) ? en.meta.source.urls : [];
+  data.meta = data.meta ?? {};
+  data.meta.source = data.meta.source ?? { name: "", urls: [] };
+  const urls = new Set(data.meta.source.urls ?? []);
+  for (const u of enUrls) urls.add(u);
+  data.meta.source.urls = [...urls];
+  console.log(
+    `[build-jsic] name_en をマージ: 大 ${nameEnApplied.major} / 中 ${nameEnApplied.middle} / 小 ${nameEnApplied.minor} / 細 ${nameEnApplied.subclass}`,
+  );
+}
+
 // 決定的に整列 (major は A〜T、その他は数値 code 昇順)。
 const byCode = (a, b) => (a.code < b.code ? -1 : a.code > b.code ? 1 : 0);
 for (const level of ["major", "middle", "minor", "subclass"]) {
@@ -69,6 +109,14 @@ data.meta.ingested = {
   minor: data.minor?.length ?? 0,
   subclass: data.subclass?.length ?? 0,
 };
+if (nameEnApplied) {
+  data.meta.nameEn = {
+    ingested: nameEnApplied,
+    completeness:
+      nameEnApplied.subclass >= (data.meta.official?.subclass ?? 0) ? "full" : "partial",
+    source: "documents/data/jsic-name-en.json",
+  };
+}
 
 const output = JSON.stringify(data, null, 2) + "\n";
 const current = readFileSync(dataPath, "utf8");
