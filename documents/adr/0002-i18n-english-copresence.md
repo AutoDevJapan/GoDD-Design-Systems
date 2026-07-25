@@ -21,7 +21,8 @@ Issue #25 は公開 MIT 資産としての国際到達のため、UI・メタ・
 3. **セル詳細（`/cells/{id}/`）のロケール二重静的生成は行わない**（`/en/cells/{id}/` を作らない）。セル本文は当面日本語のまま。
 4. **Phase 1**: セル chrome のみ、単一路線上のクエリ `?lang=en`（LocaleSwitcher 連動）で英訳する。英語ホームからのセルリンクも同クエリを付与する。静的ページ数は増やさない（Option C をセル経路に限定適用）。
 5. **コーパス一括翻訳は禁止事項として維持**。任意フィールド `titleEn` は未設定時 `title` へフォールバック（充填は別フェーズ・再材化しない）。
-6. 分類語彙の英語ラベルは既存の `taxonomy.json` `name_en` をファセット UI に接続する。JSIC 公式英名（`jsic.json` に `name_en` が無い）は別フェーズとする。
+6. 分類語彙の英語ラベルは既存の `taxonomy.json` `name_en` をファセット UI に接続する。
+7. **JSIC 英名（Phase 2 スライス）**: 総務省 MIC の JSIC Rev.14 English Structure and Explanatory Notes を出典に、`jsic.json` 各項目へ任意 `name_en` を付与する（`documents/data/jsic-name-en.json` → `pnpm run build:jsic`）。細分類は部分収録（欠落は捏造しない）。UI は細分類 `name_en` を優先し、無い場合は大分類 `name_en` へフォールバックする。**コーパス再材化は不要**。
 
 ## Options Considered
 
@@ -55,9 +56,9 @@ Option B を採る。#25 の価値の大半は「英語話者がカタログの�
 
 ## Consequences
 
-- **Positive**: `/en/` とセル `?lang=en` で chrome / taxonomy ラベルを英語利用できる。コーパス再生成なし。静的ページ数不増。
-- **Negative**: セル詳細 URL の言語はクエリ依存のため、ホームほど `hreflang` が強くない。Issue #25 の DoD（セル本文・JSIC 英名・titleEn 充填）は未完。
-- **Neutral**: JSIC `name_en` はデータ未整備のため defer。
+- **Positive**: `/en/` とセル `?lang=en` で chrome / taxonomy / JSIC（公式英名・部分）ラベルを英語利用できる。コーパス再生成なし。静的ページ数不増。
+- **Negative**: セル詳細 URL の言語はクエリ依存のため、ホームほど `hreflang` が強くない。Issue #25 の DoD（セル本文・titleEn 充填・細分類英名の完全収録）は未完。
+- **Neutral**: JSIC 細分類 `name_en` は MIC 英語 Structure Notes からの抽出で partial（欠落は major フォールバック）。
 
 ## Rollback Plan
 

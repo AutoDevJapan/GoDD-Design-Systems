@@ -84,6 +84,7 @@ function queryMatches(
     cell.jsic,
     cell.color,
     cell.mood,
+    facetDisplayLabel("jsic", cell.jsic, labels),
     facetDisplayLabel("color", cell.color, labels),
     facetDisplayLabel("mood", cell.mood, labels),
     ...cell.tags,
@@ -389,11 +390,21 @@ export function CatalogExplorer({
             {filtered.map((entry) => {
               const href = entry.href ?? cellPath(entry.id, locale);
               const external = /^https?:\/\//i.test(href);
+              const jsicLabel = facetDisplayLabel(
+                "jsic",
+                entry.jsic,
+                taxonomyLabels,
+              );
               const body = (
                 <>
                   <p className="title">{displayTitle(entry, locale)}</p>
                   <div className="meta">
-                    <span className="chip">{entry.jsic}</span>
+                    <span
+                      className="chip"
+                      title={jsicLabel !== entry.jsic ? entry.jsic : undefined}
+                    >
+                      {jsicLabel}
+                    </span>
                     <span className="chip" title={entry.color}>
                       {facetDisplayLabel("color", entry.color, taxonomyLabels)}
                     </span>

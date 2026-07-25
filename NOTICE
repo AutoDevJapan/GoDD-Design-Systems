@@ -14,6 +14,14 @@ Copyright (c) 2026 AutoDevJapan
       「日本標準産業分類 (第14回改定・令和5年7月告示)」
 提供: e-Stat 政府統計の総合窓口 (https://www.e-stat.go.jp/)
 
+英語名称 (任意フィールド name_en) の出典:
+  Ministry of Internal Affairs and Communications (MIC)
+  Japan Standard Industrial Classification (Rev. 14, 2023)
+  Structure and Explanatory Notes (English)
+  https://www.soumu.go.jp/english/dgpp_ss/seido/sangyo/san14-3.htm
+  https://www.soumu.go.jp/english/dgpp_ss/seido/sangyo/san14-3a.htm
+  取込メタ: documents/data/jsic-name-en.json（部分収録。欠落英名は捏造しない）
+
 分類コード・分類名称・分類の定義は上記の公的統計分類に基づく。
 利用は政府標準利用規約 (第2.0版) に準拠する。
 一次資料の URL は jsic.json の `meta.source.urls` に記載する。
