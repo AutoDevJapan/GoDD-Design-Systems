@@ -15,10 +15,16 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | `taxonomy.md` | `color` / `mood` の分類語彙 (SSOT, 人間可読) |
 | `taxonomy.json` | `color` / `mood` slug → 日本語ラベルの機械可読契約 (スキーマ: `documents/schema/taxonomy.schema.json`)。下流 (Matrix Pages) が raw URL から実行時 fetch し、ファセットラベルを日本語化する |
 | `jsic.json` | 業種軸 (日本標準産業分類 / JSIC) の code→名称→定義 (スキーマ: `documents/schema/jsic.schema.json`) |
-| `index.json` | 材化済みセルのメタデータ (スキーマ: `documents/schema/index.schema.json`) |
+| `index.json` | 材化済みセルのメタデータ SSOT (スキーマ: `documents/schema/index.schema.json`) |
+| `index-summary.json` | 軽量サマリ（件数・`pageSize=1000`・ファセット）。消費者は明細より先に取得する (Issue #43 / ADR-0001) |
+| `index/pages/{n}.json` | 任意生成のページシャード（0-based）。既定ではコミットしない (`build:index-summary -- --pages`) |
+| `documents/spec/index-paging.md` | summary / ページングの公開契約 |
+| `documents/adr/0001-index-summary-paging.md` | summary 先行配信の決定記録 |
 | `design-md/{jsic}/{color}/{mood}/DESIGN.md` | 材化済みセル本体 (形式: `documents/schema/design-md.schema.md`) |
 | `documents/schema/design-md.schema.json` | DESIGN.md frontmatter の JSON Schema |
 | `scripts/validate-index.mjs` | `index.json` をスキーマ + 整合性検証 (CI) |
+| `scripts/build-index-summary.mjs` | `index-summary.json`（と任意で pages）を生成 |
+| `scripts/validate-index-summary.mjs` | `index-summary.json` をスキーマ + index 整合検証 (CI) |
 | `scripts/validate-design-md.mjs` | `DESIGN.md` を frontmatter + セクション構造 + index 整合検証 (CI) |
 | `scripts/validate-jsic.mjs` | `jsic.json` をスキーマ + 親子整合 + `index.json` 相互検証 (CI) |
 | `scripts/validate-taxonomy.mjs` | `taxonomy.json` をスキーマ + `index.json` 実使用の全 color/mood カバレッジ検証 (CI) |
@@ -37,12 +43,17 @@ pnpm install
 pnpm dev        # サイトをローカル起動 (http://localhost:3000)
 pnpm build      # OG 画像生成 (build:og) + 静的サイトを out/ へ書き出し (next build, output: export)
 pnpm build:og   # OGP/Twitter 画像のみ再生成 → public/og/*.png (トークン変更時。決定的・コミット対象)
-pnpm validate   # index.json / DESIGN.md / jsic.json / taxonomy.json + 法務チェックを検証 (CI と同一)
+pnpm validate   # index.json / index-summary.json / DESIGN.md / jsic.json / taxonomy.json + 法務チェックを検証 (CI と同一)
+pnpm build:index-summary  # index.json 更新後に summary を再生成（材化と同コミットで同期）
 pnpm legal:check # de-brand / オープン書体 / 出典表示のみを個別に検証
 ```
 
 サイトのトップページは `index.json` と `taxonomy.md` の分類軸をもとに、
 材化済みセルの一覧とファセットを静的生成する。
+
+下流（Matrix 等）が raw URL からカタログを読む場合は、まず `index-summary.json` を取得し、
+明細は必要ページだけ遅延取得する（契約: `documents/spec/index-paging.md`）。
+`index.json` 全件取得はレガシーフォールバックとして残すが推奨しない。
 
 ## デプロイ (Vercel / 4 環境)
 

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/AutoDevJapan/GoDD-Design-Systems/main/documents/schema/index-page.schema.json",
+  "title": "GoDD Design-Systems index/pages/{n}.json",
+  "description": "index.json entries の 0-based ページシャード。PAGE_SIZE=1000 固定。生成は `pnpm run build:index-summary -- --pages`。本 PR 時点では巨大シャードをリポジトリへコミットしない（契約と生成器のみ）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "page",
+    "pageSize",
+    "entryCount",
+    "generatedAt",
+    "entries"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "page": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "0-based ページ番号。"
+    },
+    "pageSize": {
+      "type": "integer",
+      "const": 1000
+    },
+    "entryCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000,
+      "description": "このページに含まれる entries 長。最終ページ以外は pageSize と一致。"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "entries": {
+      "type": "array",
+      "maxItems": 1000,
+      "description": "index.schema.json の entry と同形。外部 $ref はオフライン検証を避けるためここでは object とする。",
+      "items": {
+        "type": "object",
+        "required": ["id", "path", "jsic", "color", "mood", "title", "hash", "createdAt"]
+      }
+    }
+  }
+}

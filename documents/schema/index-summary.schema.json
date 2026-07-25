@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/AutoDevJapan/GoDD-Design-Systems/main/documents/schema/index-summary.schema.json",
+  "title": "GoDD Design-Systems index-summary.json",
+  "description": "index.json の軽量サマリ。ファセット集計とページング契約メタのみを含み、明細 entries は含まない。消費者は本ファイルを先に取得し、必要なら index/pages/{n}.json を遅延取得する（documents/spec/index-paging.md）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "generatedAt",
+    "sourceGeneratedAt",
+    "entryCount",
+    "pageSize",
+    "pageCount",
+    "facets"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "任意。本ファイルを検証する JSON Schema への参照。"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1,
+      "description": "index-summary スキーマのメジャーバージョン。破壊的変更時に increment する。"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "summary の生成時刻。再生成ノイズ回避のため index.json の generatedAt と同一値を用いる。"
+    },
+    "sourceGeneratedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "元になった index.json の generatedAt（generatedAt と同値）。"
+    },
+    "entryCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "index.json entries の総件数。"
+    },
+    "pageSize": {
+      "type": "integer",
+      "const": 1000,
+      "description": "ページシャード 1 ファイルあたりの最大エントリ数。契約固定値（documents/spec/index-paging.md）。"
+    },
+    "pageCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "ceil(entryCount / pageSize)。entryCount=0 のときは 0。"
+    },
+    "facets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsic", "color", "mood", "tag"],
+      "properties": {
+        "jsic": { "$ref": "#/$defs/facetList" },
+        "color": { "$ref": "#/$defs/facetList" },
+        "mood": { "$ref": "#/$defs/facetList" },
+        "tag": { "$ref": "#/$defs/facetList" }
+      }
+    }
+  },
+  "$defs": {
+    "facetList": {
+      "type": "array",
+      "description": "軸値ごとの出現数。count 降順、同点は value 昇順。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["value", "count"],
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    }
+  }
+}

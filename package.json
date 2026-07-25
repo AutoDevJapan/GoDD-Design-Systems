@@ -16,13 +16,15 @@
     "build": "node scripts/build-og.mjs && next build",
     "start": "next start",
     "validate:index": "node scripts/validate-index.mjs",
+    "validate:index-summary": "node scripts/validate-index-summary.mjs",
     "validate:design-md": "node scripts/validate-design-md.mjs",
     "validate:jsic": "node scripts/validate-jsic.mjs",
     "validate:taxonomy": "node scripts/validate-taxonomy.mjs",
     "legal:check": "node scripts/legal-check.mjs",
     "a11y:check": "node scripts/a11y-check.mjs",
     "build:jsic": "node scripts/build-jsic.mjs",
-    "validate": "pnpm run validate:index && pnpm run validate:design-md && pnpm run validate:jsic && pnpm run validate:taxonomy && pnpm run legal:check && pnpm run a11y:check"
+    "build:index-summary": "node scripts/build-index-summary.mjs",
+    "validate": "pnpm run validate:index && pnpm run validate:index-summary && pnpm run validate:design-md && pnpm run validate:jsic && pnpm run validate:taxonomy && pnpm run legal:check && pnpm run a11y:check"
   },
   "dependencies": {
     "marked": "^18.0.7",
