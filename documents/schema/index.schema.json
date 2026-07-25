@@ -104,6 +104,11 @@
           "pattern": "^sha256:[0-9a-f]{64}$",
           "description": "任意。このセルを生成した生成方式のフィンガープリント。形式 sha256:{64桁hex}。同一の軸文脈でも生成方式が変われば DESIGN.md 本文は変わりうるため、公開済みセルと現行 Generator の出力差（再現性ドリフト）を検出するために記録する。値は不可逆ハッシュであり生成方式の内容は復元できない。"
         },
+        "canonicalCellId": {
+          "type": "string",
+          "pattern": "^v[1-9][0-9]*:virtual_[0-9]{4}_[a-z0-9]+(-[a-z0-9]+)*_[a-z0-9]+(-[a-z0-9]+)*_c[a-z0-9]+(-[a-z0-9]+)*_s[a-z0-9]+(-[a-z0-9]+)*_v(0|[1-9][0-9]*)$",
+          "description": "任意。Matrix 仮想カタログ上の正規セル座標。形式 `v{N}:virtual_{jsic}_{color}_{mood}_c{category}_s{style}_v{variant}`。接頭の `v{N}` は座標ポリシー版（破壊的変更時に increment）。既存公開セルは持たないが、新規材化では Generator が決定論的に付与する（AutoDevJapan/GoDD-Design-Generator#272）。"
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time",
