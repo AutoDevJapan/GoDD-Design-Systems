@@ -48,17 +48,17 @@ if (!entries) {
 
 const entryCount = entries.length;
 const pageCount = entryCount === 0 ? 0 : Math.ceil(entryCount / PAGE_SIZE);
-const now = new Date().toISOString();
+// index 由来の時刻に揃えて再生成ノイズを避ける（内容が同じなら summary も同一になる）。
 const sourceGeneratedAt =
   typeof index.generatedAt === "string" && index.generatedAt.length > 0
     ? index.generatedAt
-    : now;
+    : "1970-01-01T00:00:00.000Z";
 
 const summary = {
   $schema:
     "https://raw.githubusercontent.com/AutoDevJapan/GoDD-Design-Systems/main/documents/schema/index-summary.schema.json",
   version: SUMMARY_VERSION,
-  generatedAt: now,
+  generatedAt: sourceGeneratedAt,
   sourceGeneratedAt,
   entryCount,
   pageSize: PAGE_SIZE,
@@ -93,7 +93,7 @@ for (let page = 0; page < pageCount; page++) {
     page,
     pageSize: PAGE_SIZE,
     entryCount: slice.length,
-    generatedAt: now,
+    generatedAt: sourceGeneratedAt,
     entries: slice,
   };
   const out = resolve(pagesDir, `${page}.json`);

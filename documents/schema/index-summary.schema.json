@@ -27,12 +27,12 @@
     "generatedAt": {
       "type": "string",
       "format": "date-time",
-      "description": "この summary を生成した時刻 (ISO 8601 / RFC 3339)。"
+      "description": "summary の生成時刻。再生成ノイズ回避のため index.json の generatedAt と同一値を用いる。"
     },
     "sourceGeneratedAt": {
       "type": "string",
       "format": "date-time",
-      "description": "元になった index.json の generatedAt。"
+      "description": "元になった index.json の generatedAt（generatedAt と同値）。"
     },
     "entryCount": {
       "type": "integer",

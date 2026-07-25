@@ -38,7 +38,7 @@ https://raw.githubusercontent.com/AutoDevJapan/GoDD-Design-Systems/main/index.js
 必須:
 
 - `version` (const 1)
-- `generatedAt` / `sourceGeneratedAt`
+- `generatedAt` / `sourceGeneratedAt`（両方とも元 `index.json` の `generatedAt`。再生成ノイズを避けるため wall-clock は使わない）
 - `entryCount` / `pageSize` (1000) / `pageCount`
 - `facets.{jsic,color,mood,tag}[]` … `{ value, count }`（count 降順、同点は value 昇順）
 
