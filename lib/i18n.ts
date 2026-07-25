@@ -47,6 +47,10 @@ export type UiMessages = {
   localeNameJa: string;
   localeNameEn: string;
   corpusNotice: string;
+  /** Pages remote カタログ読込中。 */
+  catalogLoading: string;
+  /** Pages remote カタログ読込失敗。 */
+  catalogLoadError: string;
 };
 
 const ja: UiMessages = {
@@ -81,6 +85,9 @@ const ja: UiMessages = {
   localeNameEn: "English",
   corpusNotice:
     "セル詳細ページと DESIGN.md 本文は現時点では日本語のみです（英語併記は段階導入中）。",
+  catalogLoading: "カタログを読み込んでいます…",
+  catalogLoadError:
+    "カタログの読み込みに失敗しました。しばらくしてから再読み込みしてください。",
 };
 
 const en: UiMessages = {
@@ -115,6 +122,8 @@ const en: UiMessages = {
   localeNameEn: "English",
   corpusNotice:
     "Cell detail pages and DESIGN.md bodies are Japanese-only for now (English co-presence is rolling out in phases).",
+  catalogLoading: "Loading catalog…",
+  catalogLoadError: "Failed to load the catalog. Please reload and try again.",
 };
 
 const MESSAGES: Record<Locale, UiMessages> = { ja, en };

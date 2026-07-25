@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { loadIndex } from "@/lib/catalog";
+import { listSitemapCellEntries } from "@/lib/pages-build";
 import { absoluteUrl } from "@/lib/site";
 
 // `output: 'export'`（静的エクスポート）で sitemap.xml を静的生成するために必須。
@@ -8,7 +9,8 @@ export const dynamic = "force-static";
 /**
  * sitemap.xml を静的生成する（Metadata Route）。`output: 'export'` と両立し、
  * ビルド時に `out/sitemap.xml` として書き出される。
- * トップページ + `index.json` の全セル詳細 URL を列挙する。
+ * トップ（ja/en）+ 静的エクスポート対象のセル詳細 URL。
+ * Pages ビルドではセル詳細を省略する（ADR-0004）。
  * URL は `trailingSlash: true`（next.config.mjs）に合わせて末尾スラッシュ付き。
  */
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -30,7 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   };
 
-  const cells: MetadataRoute.Sitemap = index.entries.map((entry) => ({
+  const cells: MetadataRoute.Sitemap = listSitemapCellEntries().map((entry) => ({
     url: absoluteUrl(`/cells/${entry.id}/`),
     lastModified: new Date(entry.updatedAt ?? entry.createdAt ?? index.generatedAt),
     changeFrequency: "monthly",

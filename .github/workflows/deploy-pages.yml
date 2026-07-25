@@ -1,0 +1,75 @@
+# 公開ブラウズ UI を GitHub Pages へデプロイする（Issue #66 / ADR-0004）。
+# 51k セル HTML は生成しない（chrome + カタログのみ。セル本文は GitHub blob へ）。
+
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "lib/**"
+      - "public/**"
+      - "scripts/build-og.mjs"
+      - "scripts/build-pages.mjs"
+      - "next.config.mjs"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "tsconfig.json"
+      - "index.json"
+      - "index-summary.json"
+      - "taxonomy.json"
+      - "taxonomy.md"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: 静的エクスポート (Pages)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: 依存インストール
+        run: pnpm install --frozen-lockfile
+
+      - name: Pages 向けビルド (chrome + カタログ)
+        run: pnpm run build:pages
+        env:
+          GODD_PAGES_BUILD: "1"
+          GODD_STATIC_CELL_LIMIT: "1"
+          GODD_OG_CELL_LIMIT: "0"
+          NEXT_PUBLIC_SITE_URL: https://autodevjapan.github.io/GoDD-Design-Systems
+
+      - name: Pages artifact をアップロード
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: out
+
+  deploy:
+    name: GitHub Pages へデプロイ
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: デプロイ
+        id: deployment
+        uses: actions/deploy-pages@v4

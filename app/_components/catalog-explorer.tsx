@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fillTemplate, type UiMessages } from "@/lib/i18n";
+import { githubBlobUrl } from "@/lib/site-urls";
 
 /** ブラウズに必要な最小のセル情報（軽量インデックス）。ビルド時に埋め込む。 */
 export type CatalogCell = {
@@ -12,6 +13,11 @@ export type CatalogCell = {
   color: string;
   mood: string;
   tags: string[];
+  /**
+   * 詳細への href。通常は `/cells/{id}/`。
+   * Pages ビルドでは DESIGN.md の GitHub blob URL（ADR-0004）。
+   */
+  href: string;
 };
 
 /** 絞り込みの対象となる分類軸。 */
@@ -104,16 +110,65 @@ function buildSearch(selected: Selected, query: string): string {
   return s ? `?${s}` : "";
 }
 
+type RemoteIndexEntry = {
+  id: string;
+  title: string;
+  jsic: string;
+  color: string;
+  mood: string;
+  tags?: string[];
+  path: string;
+};
+
 export function CatalogExplorer({
-  cells,
+  cells: initialCells,
   messages,
+  remoteIndexUrl,
 }: {
   cells: CatalogCell[];
   messages: UiMessages;
+  /** 指定時はマウント後に remote index.json を fetch（Pages 軽量化）。 */
+  remoteIndexUrl?: string;
 }) {
   const labels = axisLabels(messages);
+  const [cells, setCells] = useState<CatalogCell[]>(initialCells);
+  const [remoteStatus, setRemoteStatus] = useState<
+    "idle" | "loading" | "ready" | "error"
+  >(remoteIndexUrl ? "loading" : "idle");
   const [selected, setSelected] = useState<Selected>(emptySelected);
   const [query, setQuery] = useState("");
+
+  // Pages: raw index.json をクライアント取得（43MB HTML 埋め込みを避ける）。
+  useEffect(() => {
+    if (!remoteIndexUrl) return;
+    let cancelled = false;
+    setRemoteStatus("loading");
+    (async () => {
+      try {
+        const res = await fetch(remoteIndexUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = (await res.json()) as { entries: RemoteIndexEntry[] };
+        if (cancelled) return;
+        setCells(
+          data.entries.map((e) => ({
+            id: e.id,
+            title: e.title,
+            jsic: e.jsic,
+            color: e.color,
+            mood: e.mood,
+            tags: e.tags ?? [],
+            href: githubBlobUrl(e.path),
+          })),
+        );
+        setRemoteStatus("ready");
+      } catch {
+        if (!cancelled) setRemoteStatus("error");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [remoteIndexUrl]);
 
   // マウント後に URL クエリから初期状態を復元（共有リンクの反映）。
   // 初回レンダは無フィルタ（= サーバ生成 HTML と一致）にしてハイドレーション不整合を避ける。
@@ -246,6 +301,16 @@ export function CatalogExplorer({
 
       <section className="section" aria-labelledby="cells-heading">
         <h2 id="cells-heading">{messages.catalogHeading}</h2>
+        {remoteStatus === "loading" ? (
+          <p className="empty" role="status">
+            {messages.catalogLoading}
+          </p>
+        ) : null}
+        {remoteStatus === "error" ? (
+          <p className="empty" role="alert">
+            {messages.catalogLoadError}
+          </p>
+        ) : null}
         <div className="toolbar">
           <div className="search">
             <label htmlFor="cell-search" className="search-label">
@@ -278,22 +343,36 @@ export function CatalogExplorer({
 
         {filtered.length > 0 ? (
           <div className="cards">
-            {filtered.map((entry) => (
-              <Link
-                className="card"
-                key={entry.id}
-                href={`/cells/${entry.id}/`}
-              >
-                <p className="title">{entry.title}</p>
-                <div className="meta">
-                  <span className="chip">{entry.jsic}</span>
-                  <span className="chip">{entry.color}</span>
-                  <span className="chip">{entry.mood}</span>
-                </div>
-                <div className="tags">{entry.tags.join(" · ")}</div>
-                <div className="id">{entry.id}</div>
-              </Link>
-            ))}
+            {filtered.map((entry) => {
+              const external = /^https?:\/\//i.test(entry.href);
+              const body = (
+                <>
+                  <p className="title">{entry.title}</p>
+                  <div className="meta">
+                    <span className="chip">{entry.jsic}</span>
+                    <span className="chip">{entry.color}</span>
+                    <span className="chip">{entry.mood}</span>
+                  </div>
+                  <div className="tags">{entry.tags.join(" · ")}</div>
+                  <div className="id">{entry.id}</div>
+                </>
+              );
+              return external ? (
+                <a
+                  className="card"
+                  key={entry.id}
+                  href={entry.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {body}
+                </a>
+              ) : (
+                <Link className="card" key={entry.id} href={entry.href}>
+                  {body}
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <p className="empty" role="status">

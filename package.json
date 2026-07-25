@@ -14,6 +14,7 @@
     "dev": "next dev",
     "build:og": "node scripts/build-og.mjs",
     "build": "node scripts/build-og.mjs && next build",
+    "build:pages": "node scripts/build-pages.mjs",
     "start": "next start",
     "validate:index": "node scripts/validate-index.mjs",
     "validate:index-summary": "node scripts/validate-index-summary.mjs",

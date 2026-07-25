@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { loadIndex } from "@/lib/catalog";
+import { loadIndex, loadIndexSummary } from "@/lib/catalog";
 import { SiteFooter } from "@/app/_components/site-footer";
 import { LocaleSwitcher } from "@/app/_components/locale-switcher";
 import {
@@ -7,6 +7,11 @@ import {
   type CatalogCell,
 } from "@/app/_components/catalog-explorer";
 import { messagesFor, SITE_LANGUAGE_ALTERNATES } from "@/lib/i18n";
+import {
+  cellDetailHref,
+  isPagesBuild,
+  REMOTE_INDEX_URL,
+} from "@/lib/pages-build";
 import { SITE_NAME } from "@/lib/site";
 
 const locale = "ja" as const;
@@ -37,22 +42,27 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const index = loadIndex();
+  const pages = isPagesBuild();
+  // Pages: カタログは remote index をクライアント取得（静的 HTML 肥大化を避ける）。
+  // ローカル: 従来どおりビルド時埋め込み。
+  const index = pages ? null : loadIndex();
+  const summary = pages ? loadIndexSummary() : null;
+  const generatedAt = pages
+    ? summary!.generatedAt
+    : index!.generatedAt;
 
-  // ビルド時に軽量インデックス（ブラウズに必要な最小情報）を埋め込み、
-  // クライアント側で絞り込み / 検索する。静的エクスポート (output: export)
-  // と両立し、全セルが初期 HTML に含まれるため SEO も損なわない。
-  const cells: CatalogCell[] = index.entries.map((e) => ({
-    id: e.id,
-    title: e.title,
-    jsic: e.jsic,
-    color: e.color,
-    mood: e.mood,
-    tags: e.tags,
-  }));
+  const cells: CatalogCell[] = pages
+    ? []
+    : index!.entries.map((e) => ({
+        id: e.id,
+        title: e.title,
+        jsic: e.jsic,
+        color: e.color,
+        mood: e.mood,
+        tags: e.tags,
+        href: cellDetailHref(e),
+      }));
 
-  // ランドマーク整理: header(banner) / main / footer(contentinfo) を .wrap 直下の
-  // 兄弟に配置する。header/footer を main の子孫に置くとランドマーク扱いされないため。
   return (
     <div className="wrap">
       <header className="site-header">
@@ -64,10 +74,14 @@ export default function HomePage() {
       </header>
 
       <main id="main-content" tabIndex={-1}>
-        <CatalogExplorer cells={cells} messages={messages} />
+        <CatalogExplorer
+          cells={cells}
+          messages={messages}
+          remoteIndexUrl={pages ? REMOTE_INDEX_URL : undefined}
+        />
       </main>
 
-      <SiteFooter generatedAt={index.generatedAt} messages={messages} />
+      <SiteFooter generatedAt={generatedAt} messages={messages} />
     </div>
   );
 }
