@@ -17,6 +17,10 @@ const nextConfig = {
   // CI は `pnpm exec tsc --noEmit` で型検査する。Next 内蔵の型チェックは
   // TypeScript 7 + pnpm 環境で誤って「未インストール」と判定し落ちるため無効化する。
   typescript: { ignoreBuildErrors: true },
+  // design-md 約 5 万ファイルを Output File Tracing から除外（Pages CI OOM / 誤トレース回避）。
+  outputFileTracingExcludes: {
+    "/*": ["./design-md/**/*"],
+  },
   ...(isPagesBuild
     ? { basePath: pagesBasePath, assetPrefix: pagesBasePath }
     : {}),
