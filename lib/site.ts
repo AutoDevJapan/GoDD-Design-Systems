@@ -12,7 +12,7 @@ export const SITE_URL: string = (
 /** サイト名（OpenGraph `siteName` 等で使用）。 */
 export const SITE_NAME = "GoDD Design-Systems";
 
-/** サイト全体の既定 description。 */
+/** サイト全体の既定 description（日本語）。英語は `lib/i18n.ts` を参照。 */
 export const SITE_DESCRIPTION =
   "業種 (JSIC) × カラー (PCCS) × ムードで整理した、AI が読む DESIGN.md のオープンカタログ (MIT)。";
 

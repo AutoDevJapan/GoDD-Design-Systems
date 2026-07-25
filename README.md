@@ -20,6 +20,9 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | `index/pages/{n}.json` | 任意生成のページシャード（0-based）。既定ではコミットしない (`build:index-summary -- --pages`) |
 | `documents/spec/index-paging.md` | summary / ページングの公開契約 |
 | `documents/adr/0001-index-summary-paging.md` | summary 先行配信の決定記録 |
+| `documents/adr/0002-i18n-english-copresence.md` | 英語併記の段階導入（UI chrome 先行・コーパス非一括翻訳） |
+| `app/en/` | 英語ホーム（サイト chrome 英訳。セル本文は日本語のまま） |
+| `lib/i18n.ts` | サイト chrome 向け JA/EN メッセージ |
 | `design-md/{jsic}/{color}/{mood}/DESIGN.md` | 材化済みセル本体 (形式: `documents/schema/design-md.schema.md`) |
 | `documents/schema/design-md.schema.json` | DESIGN.md frontmatter の JSON Schema |
 | `scripts/validate-index.mjs` | `index.json` をスキーマ + 整合性検証 (CI) |

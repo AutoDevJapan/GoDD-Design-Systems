@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { fillTemplate, type UiMessages } from "@/lib/i18n";
 
 /** ブラウズに必要な最小のセル情報（軽量インデックス）。ビルド時に埋め込む。 */
 export type CatalogCell = {
@@ -16,12 +17,16 @@ export type CatalogCell = {
 /** 絞り込みの対象となる分類軸。 */
 export type Axis = "jsic" | "color" | "mood" | "tag";
 
-const AXES: { key: Axis; label: string }[] = [
-  { key: "jsic", label: "業種 (JSIC)" },
-  { key: "color", label: "カラー" },
-  { key: "mood", label: "ムード" },
-  { key: "tag", label: "タグ" },
-];
+const AXIS_KEYS: Axis[] = ["jsic", "color", "mood", "tag"];
+
+function axisLabels(messages: UiMessages): Record<Axis, string> {
+  return {
+    jsic: messages.axisJsic,
+    color: messages.axisColor,
+    mood: messages.axisMood,
+    tag: messages.axisTag,
+  };
+}
 
 /** セルが軸ごとに持つ値の配列を返す（tag のみ複数値）。 */
 function axisValues(cell: CatalogCell, axis: Axis): string[] {
@@ -63,7 +68,7 @@ function matchesExcept(
   query: string,
   exceptAxis: Axis | null,
 ): boolean {
-  for (const { key } of AXES) {
+  for (const key of AXIS_KEYS) {
     if (key === exceptAxis) continue;
     if (!axisMatches(cell, key, selected[key])) return false;
   }
@@ -77,7 +82,7 @@ const QUERY_PARAM = "q";
 function parseUrl(search: string): { selected: Selected; query: string } {
   const params = new URLSearchParams(search);
   const selected = emptySelected();
-  for (const { key } of AXES) {
+  for (const key of AXIS_KEYS) {
     const raw = params.get(key);
     if (raw) {
       for (const v of raw.split(",").map((s) => s.trim()).filter(Boolean)) {
@@ -90,7 +95,7 @@ function parseUrl(search: string): { selected: Selected; query: string } {
 
 function buildSearch(selected: Selected, query: string): string {
   const params = new URLSearchParams();
-  for (const { key } of AXES) {
+  for (const key of AXIS_KEYS) {
     const values = [...selected[key]];
     if (values.length > 0) params.set(key, values.join(","));
   }
@@ -99,7 +104,14 @@ function buildSearch(selected: Selected, query: string): string {
   return s ? `?${s}` : "";
 }
 
-export function CatalogExplorer({ cells }: { cells: CatalogCell[] }) {
+export function CatalogExplorer({
+  cells,
+  messages,
+}: {
+  cells: CatalogCell[];
+  messages: UiMessages;
+}) {
+  const labels = axisLabels(messages);
   const [selected, setSelected] = useState<Selected>(emptySelected);
   const [query, setQuery] = useState("");
 
@@ -139,7 +151,7 @@ export function CatalogExplorer({ cells }: { cells: CatalogCell[] }) {
 
   const activeCount = useMemo(
     () =>
-      AXES.reduce((n, { key }) => n + selected[key].size, 0) +
+      AXIS_KEYS.reduce((n, key) => n + selected[key].size, 0) +
       (query.trim() ? 1 : 0),
     [selected, query],
   );
@@ -159,7 +171,7 @@ export function CatalogExplorer({ cells }: { cells: CatalogCell[] }) {
       mood: [],
       tag: [],
     };
-    for (const { key } of AXES) {
+    for (const key of AXIS_KEYS) {
       const counts = new Map<string, number>();
       // 全セルから当該軸の候補値を洗い出す（母集合は固定）。
       for (const cell of cells) {
@@ -184,60 +196,66 @@ export function CatalogExplorer({ cells }: { cells: CatalogCell[] }) {
   return (
     <>
       <section className="section" aria-labelledby="axes-heading">
-        <h2 id="axes-heading">分類軸で絞り込む</h2>
+        <h2 id="axes-heading">{messages.axesHeading}</h2>
         <p className="lead">
-          値集合の SSOT は{" "}
+          {messages.axesLeadBefore}
           <a href="https://github.com/AutoDevJapan/GoDD-Design-Systems/blob/main/taxonomy.md">
             taxonomy.md
-          </a>{" "}
-          で定義。チップを押すと下のカタログを絞り込みます（同一軸内は
-          OR、軸をまたぐと AND）。件数は現在の絞り込みでの残件数です。
+          </a>
+          {messages.axesLeadAfter}
         </p>
         <div className="facets">
-          {AXES.map(({ key, label }) => (
-            <div className="facet" key={key}>
-              <h3 id={`facet-${key}`}>{label}</h3>
-              <div
-                className="chips"
-                role="group"
-                aria-labelledby={`facet-${key}`}
-              >
-                {facets[key].map((f) => {
-                  const isSelected = selected[key].has(f.value);
-                  const disabled = f.count === 0 && !isSelected;
-                  return (
-                    <button
-                      type="button"
-                      className={`chip chip-btn${isSelected ? " is-selected" : ""}`}
-                      key={f.value}
-                      aria-pressed={isSelected}
-                      aria-label={`${label} ${f.value}（${f.count} 件）`}
-                      disabled={disabled}
-                      onClick={() => toggle(key, f.value)}
-                    >
-                      {f.value}
-                      <span className="count">{f.count}</span>
-                    </button>
-                  );
-                })}
+          {AXIS_KEYS.map((key) => {
+            const label = labels[key];
+            return (
+              <div className="facet" key={key}>
+                <h3 id={`facet-${key}`}>{label}</h3>
+                <div
+                  className="chips"
+                  role="group"
+                  aria-labelledby={`facet-${key}`}
+                >
+                  {facets[key].map((f) => {
+                    const isSelected = selected[key].has(f.value);
+                    const disabled = f.count === 0 && !isSelected;
+                    return (
+                      <button
+                        type="button"
+                        className={`chip chip-btn${isSelected ? " is-selected" : ""}`}
+                        key={f.value}
+                        aria-pressed={isSelected}
+                        aria-label={fillTemplate(messages.chipAriaTemplate, {
+                          label,
+                          value: f.value,
+                          count: f.count,
+                        })}
+                        disabled={disabled}
+                        onClick={() => toggle(key, f.value)}
+                      >
+                        {f.value}
+                        <span className="count">{f.count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
       <section className="section" aria-labelledby="cells-heading">
-        <h2 id="cells-heading">カタログ</h2>
+        <h2 id="cells-heading">{messages.catalogHeading}</h2>
         <div className="toolbar">
           <div className="search">
             <label htmlFor="cell-search" className="search-label">
-              セルを検索
+              {messages.searchLabel}
             </label>
             <input
               id="cell-search"
               type="search"
               className="search-input"
-              placeholder="タイトル / タグ / 軸で検索"
+              placeholder={messages.searchPlaceholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoComplete="off"
@@ -245,11 +263,14 @@ export function CatalogExplorer({ cells }: { cells: CatalogCell[] }) {
           </div>
           <div className="toolbar-status">
             <p className="result-count" role="status" aria-live="polite">
-              {filtered.length} / {cells.length} 件
+              {fillTemplate(messages.resultCountTemplate, {
+                filtered: filtered.length,
+                total: cells.length,
+              })}
             </p>
             {activeCount > 0 ? (
               <button type="button" className="clear-btn" onClick={clearAll}>
-                絞り込みをクリア
+                {messages.clearFilters}
               </button>
             ) : null}
           </div>
@@ -276,9 +297,9 @@ export function CatalogExplorer({ cells }: { cells: CatalogCell[] }) {
           </div>
         ) : (
           <p className="empty" role="status">
-            条件に一致するセルがありません。
+            {messages.emptyResults}
             <button type="button" className="clear-btn inline" onClick={clearAll}>
-              絞り込みをクリア
+              {messages.clearFilters}
             </button>
           </p>
         )}

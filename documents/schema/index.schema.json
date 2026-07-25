@@ -92,7 +92,13 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "description": "人間可読の見出し (ブラウズ/SEO 用)。"
+          "description": "人間可読の見出し（日本語。ブラウズ/SEO 用）。"
+        },
+        "titleEn": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "任意。人間可読の英語見出し。未設定時は title（ja）へフォールバック（Issue #25 / ADR-0002）。DESIGN.md frontmatter の titleEn と一致すること。"
         },
         "hash": {
           "type": "string",

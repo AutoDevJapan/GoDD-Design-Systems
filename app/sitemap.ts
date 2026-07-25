@@ -15,11 +15,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const index = loadIndex();
   const indexModified = new Date(index.generatedAt);
 
-  const home: MetadataRoute.Sitemap[number] = {
+  const homeJa: MetadataRoute.Sitemap[number] = {
     url: absoluteUrl("/"),
     lastModified: indexModified,
     changeFrequency: "weekly",
     priority: 1,
+  };
+
+  // 英語ホームのみ（セル詳細のロケール二重列挙はしない — ADR-0002）。
+  const homeEn: MetadataRoute.Sitemap[number] = {
+    url: absoluteUrl("/en/"),
+    lastModified: indexModified,
+    changeFrequency: "weekly",
+    priority: 0.9,
   };
 
   const cells: MetadataRoute.Sitemap = index.entries.map((entry) => ({
@@ -29,5 +37,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [home, ...cells];
+  return [homeJa, homeEn, ...cells];
 }
