@@ -24,6 +24,8 @@
     "a11y:check": "node scripts/a11y-check.mjs",
     "build:jsic": "node scripts/build-jsic.mjs",
     "build:index-summary": "node scripts/build-index-summary.mjs",
+    "validate:index-pages": "node scripts/validate-index-pages.mjs",
+    "package:index-pages": "node scripts/package-index-pages.mjs",
     "validate": "pnpm run validate:index && pnpm run validate:index-summary && pnpm run validate:design-md && pnpm run validate:jsic && pnpm run validate:taxonomy && pnpm run legal:check && pnpm run a11y:check"
   },
   "dependencies": {

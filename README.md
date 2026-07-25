@@ -17,12 +17,16 @@ AI エージェントが読む Markdown 形式のデザインシステム (DESIG
 | `jsic.json` | 業種軸 (日本標準産業分類 / JSIC) の code→名称→定義 (スキーマ: `documents/schema/jsic.schema.json`) |
 | `index.json` | 材化済みセルのメタデータ SSOT (スキーマ: `documents/schema/index.schema.json`) |
 | `index-summary.json` | 軽量サマリ（件数・`pageSize=1000`・ファセット）。消費者は明細より先に取得する (Issue #43 / ADR-0001) |
-| `index/pages/{n}.json` | 任意生成のページシャード（0-based）。既定ではコミットしない (`build:index-summary -- --pages`) |
+| `index/pages/{n}.json` | 任意生成のページシャード（0-based）。**git にはコミットしない**。公開は Release タグ `index-pages`（ADR-0003） |
 | `documents/spec/index-paging.md` | summary / ページングの公開契約 |
 | `documents/adr/0001-index-summary-paging.md` | summary 先行配信の決定記録 |
 | `documents/adr/0002-i18n-english-copresence.md` | 英語併記の段階導入（UI chrome 先行・コーパス非一括翻訳） |
+| `documents/adr/0003-index-pages-release-publish.md` | pages を Release asset で公開する決定 |
 | `app/en/` | 英語ホーム（サイト chrome 英訳。セル本文は日本語のまま） |
 | `lib/i18n.ts` | サイト chrome 向け JA/EN メッセージ |
+| `scripts/validate-index-pages.mjs` | 生成済み pages の契約検証（未生成時は SKIP） |
+| `scripts/package-index-pages.mjs` | Release 用ステージング（manifest + 個別 JSON） |
+| `.github/workflows/publish-index-pages.yml` | `workflow_dispatch` のみで pages を Release 公開 |
 | `design-md/{jsic}/{color}/{mood}/DESIGN.md` | 材化済みセル本体 (形式: `documents/schema/design-md.schema.md`) |
 | `documents/schema/design-md.schema.json` | DESIGN.md frontmatter の JSON Schema |
 | `scripts/validate-index.mjs` | `index.json` をスキーマ + 整合性検証 (CI) |
@@ -48,14 +52,18 @@ pnpm build      # OG 画像生成 (build:og) + 静的サイトを out/ へ書き
 pnpm build:og   # OGP/Twitter 画像のみ再生成 → public/og/*.png (トークン変更時。決定的・コミット対象)
 pnpm validate   # index.json / index-summary.json / DESIGN.md / jsic.json / taxonomy.json + 法務チェックを検証 (CI と同一)
 pnpm build:index-summary  # index.json 更新後に summary を再生成（材化と同コミットで同期）
+pnpm build:index-summary -- --pages  # ローカルに pages を生成（gitignore）
+pnpm validate:index-pages # 生成済み pages の PAGE_SIZE / 結合件数を検証
+pnpm package:index-pages  # Release 配布用に dist/ へステージング
 pnpm legal:check # de-brand / オープン書体 / 出典表示のみを個別に検証
 ```
 
 サイトのトップページは `index.json` と `taxonomy.md` の分類軸をもとに、
 材化済みセルの一覧とファセットを静的生成する。
 
-下流（Matrix 等）が raw URL からカタログを読む場合は、まず `index-summary.json` を取得し、
-明細は必要ページだけ遅延取得する（契約: `documents/spec/index-paging.md`）。
+下流（Matrix 等）がカタログを読む場合は、まず raw の `index-summary.json` を取得し、
+明細は GitHub Release `index-pages` の `{n}.json` だけを遅延取得する（契約: `documents/spec/index-paging.md` / ADR-0003）。
+pages の再公開は Actions「Publish index pages」を手動実行する（PR ごとには走らない）。
 `index.json` 全件取得はレガシーフォールバックとして残すが推奨しない。
 
 ## デプロイ (Vercel / 4 環境)
