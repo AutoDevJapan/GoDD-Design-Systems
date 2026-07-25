@@ -16,11 +16,12 @@ Issue #25 は公開 MIT 資産としての国際到達のため、UI・メタ・
 
 ## Decision
 
-1. **Phase 0（本スパイク）**: サイト chrome（ヘッダ・フッタ・カタログ UI 文言・ホームメタ）を JA/EN 併記する。ルートは既存 `/`（ja）を維持し、英語ホームを `/en/` に追加する（`trailingSlash: true` と両立）。
+1. **Phase 0（スパイク）**: サイト chrome（ヘッダ・フッタ・カタログ UI 文言・ホームメタ）を JA/EN 併記する。ルートは既存 `/`（ja）を維持し、英語ホームを `/en/` に追加する（`trailingSlash: true` と両立）。
 2. **`hreflang` / `alternates.languages`** で `/` ↔ `/en/` を相互リンクする。`<html lang>` はロケールに合わせる。
-3. **セル詳細（`/cells/{id}/`）のロケール二重静的生成は行わない**。セル本文は当面日本語のまま。英語ホームからセルへ遷移した利用者には、日本語 DESIGN.md である旨を UI で示す（フォローアップで chrome のみ英訳可）。
-4. **コーパス一括翻訳は禁止事項として維持**。将来の二言語化は任意フィールド `titleEn`（frontmatter / index entry）の段階充填で進め、未設定時は `title`（ja）へフォールバックする。
-5. 分類語彙の英語ラベルは既存の `taxonomy.json` `name_en` を再利用し、JSIC 公式英名整備は別フェーズとする。
+3. **セル詳細（`/cells/{id}/`）のロケール二重静的生成は行わない**（`/en/cells/{id}/` を作らない）。セル本文は当面日本語のまま。
+4. **Phase 1**: セル chrome のみ、単一路線上のクエリ `?lang=en`（LocaleSwitcher 連動）で英訳する。英語ホームからのセルリンクも同クエリを付与する。静的ページ数は増やさない（Option C をセル経路に限定適用）。
+5. **コーパス一括翻訳は禁止事項として維持**。任意フィールド `titleEn` は未設定時 `title` へフォールバック（充填は別フェーズ・再材化しない）。
+6. 分類語彙の英語ラベルは既存の `taxonomy.json` `name_en` をファセット UI に接続する。JSIC 公式英名（`jsic.json` に `name_en` が無い）は別フェーズとする。
 
 ## Options Considered
 
@@ -54,9 +55,9 @@ Option B を採る。#25 の価値の大半は「英語話者がカタログの�
 
 ## Consequences
 
-- **Positive**: `/en/` で英語 UI を実証できる。コーパス再生成なし。将来の二言語 title をスキーマで受けられる。
-- **Negative**: Issue #25 の DoD（主要ページ英語版）はセル詳細を含めて未完。チェックリストでフォローアップを明示する。
-- **Neutral**: taxonomy の `name_en` は既存のまま。JSIC 英名は未着手。
+- **Positive**: `/en/` とセル `?lang=en` で chrome / taxonomy ラベルを英語利用できる。コーパス再生成なし。静的ページ数不増。
+- **Negative**: セル詳細 URL の言語はクエリ依存のため、ホームほど `hreflang` が強くない。Issue #25 の DoD（セル本文・JSIC 英名・titleEn 充填）は未完。
+- **Neutral**: JSIC `name_en` はデータ未整備のため defer。
 
 ## Rollback Plan
 
