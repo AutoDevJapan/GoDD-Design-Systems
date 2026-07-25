@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/AutoDevJapan/GoDD-Design-Systems/main/documents/schema/index-page.schema.json",
   "title": "GoDD Design-Systems index/pages/{n}.json",
-  "description": "index.json entries の 0-based ページシャード。PAGE_SIZE=1000 固定。生成は `pnpm run build:index-summary -- --pages`。本 PR 時点では巨大シャードをリポジトリへコミットしない（契約と生成器のみ）。",
+  "description": "index.json entries の 0-based ページシャード。PAGE_SIZE=1000 固定。生成は `pnpm run build:index-summary -- --pages`。git にはコミットせず GitHub Release `index-pages` で公開する（ADR-0003）。",
   "type": "object",
   "additionalProperties": false,
   "required": [

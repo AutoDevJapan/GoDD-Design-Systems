@@ -1,0 +1,85 @@
+# index/pages シャードを GitHub Release asset として公開する（ADR-0003 / Issue #63）。
+# PR や push では走らせない（Actions / git コスト回避）。手動 workflow_dispatch のみ。
+
+name: Publish index pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-index-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: 生成・検証・Release アップロード
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: 依存インストール
+        run: pnpm install --frozen-lockfile
+
+      - name: ページシャード生成
+        run: pnpm run build:index-summary -- --pages
+
+      - name: summary 整合検証
+        run: pnpm run validate:index-summary
+
+      - name: pages 契約検証
+        run: pnpm run validate:index-pages
+
+      - name: Release 用ステージング
+        run: pnpm run package:index-pages
+
+      - name: zip 作成
+        working-directory: dist/index-pages-release
+        run: zip -r ../../index-pages.zip index
+
+      - name: 既存 Release / タグを置き換え
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view index-pages >/dev/null 2>&1; then
+            gh release delete index-pages --yes
+          fi
+          git push origin :refs/tags/index-pages 2>/dev/null || true
+          git tag -f index-pages
+          git push origin index-pages --force
+
+      - name: Release 作成とアセットアップロード
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          NOTES="$(mktemp)"
+          {
+            echo "## index/pages シャード"
+            echo
+            echo "ADR-0003 / Issue #63。\`main\` にはコミットせず Release asset のみ公開。"
+            echo
+            echo "- pageSize: 1000"
+            echo "- 個別取得: \`https://github.com/${{ github.repository }}/releases/download/index-pages/{n}.json\`"
+            echo "- 一括: \`index-pages.zip\`（内パス \`index/pages/{n}.json\`）"
+            echo "- manifest: \`manifest.json\`"
+            echo
+            echo "生成元 commit: \`${{ github.sha }}\`"
+          } > "$NOTES"
+
+          # dist 直下の *.json = manifest.json + 0.json .. {pageCount-1}.json
+          gh release create index-pages \
+            --title "index/pages shards" \
+            --notes-file "$NOTES" \
+            index-pages.zip \
+            dist/index-pages-release/*.json
