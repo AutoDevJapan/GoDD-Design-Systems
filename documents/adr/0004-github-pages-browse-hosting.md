@@ -63,3 +63,12 @@ ADR-0003 の Option C は **index/pages シャード配信** の候補であり�
 
 - `pnpm run build:pages` が `out/index.html` と `out/en/index.html` を生成する。
 - デプロイ後、`/` と `/en/` が HTTP 200 でアプリ HTML を返す（GitHub の Site-not-found ではない）。
+
+## 事業者情報の開示請求（2026-10-10）
+販売者は AutoDevJapan、問い合わせ先は contact@autodevjapan.com を保持する。
+氏名・所在地・電話番号の正式情報をこのリポジトリに複製せず、常時掲載しない。
+既存の法的ページ・購入前条件欄、または法的ページのない公開サイトの共通フッターから
+[事業者情報の開示請求](https://autodevjapan.com/api/disclosure)へ案内する。
+メールでの開示請求も受け付ける。請求処理と正式原本は共通の公式サイトが管理する。
+この変更は表示導線のみであり、本番POSTの受入、実課金、販売開始を完了扱いしない。
+親ToDo2174が正式原本と本番POSTを受け入れるまで、導線のPRは下書きで保持する。
