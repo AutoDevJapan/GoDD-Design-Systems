@@ -65,6 +65,8 @@ export type UiMessages = {
   emptyResults: string;
   /** `{label}` `{value}` `{count}` を置換する。 */
   chipAriaTemplate: string;
+  footerOperatorLabel: string;
+  footerContactLabel: string;
   footerBeforeLicense: string;
   footerAfterLicense: string;
   /** `{iso}` を置換する。 */
@@ -114,6 +116,8 @@ const ja: UiMessages = {
   clearFilters: "絞り込みをクリア",
   emptyResults: "条件に一致するセルがありません。",
   chipAriaTemplate: "{label} {value}（{count} 件）",
+  footerOperatorLabel: "事業者",
+  footerContactLabel: "お問い合わせ",
   footerBeforeLicense: "© GoDD Design-Systems — License: ",
   footerAfterLicense:
     "。カラー軸は PCCS (日本色研配色体系) / JIS 無彩色、業種軸は日本標準産業分類 (JSIC) に基づく分類語彙を用いる。特定ブランドの色名・書体は含まない。",
@@ -164,6 +168,8 @@ const en: UiMessages = {
   clearFilters: "Clear filters",
   emptyResults: "No cells match the current filters.",
   chipAriaTemplate: "{label} {value} ({count})",
+  footerOperatorLabel: "Operator",
+  footerContactLabel: "Contact",
   footerBeforeLicense: "© GoDD Design-Systems — License: ",
   footerAfterLicense:
     ". Color axis uses PCCS / JIS achromatic terms; industry axis uses Japan Standard Industrial Classification (JSIC). No brand-specific color or typeface names.",

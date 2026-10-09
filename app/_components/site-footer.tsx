@@ -10,6 +10,11 @@ export function SiteFooter({
 }) {
   return (
     <footer className="site-footer">
+      <p>{messages.footerOperatorLabel}: AutoDevJapan</p>
+      <p>
+        {messages.footerContactLabel}: {" "}
+        <a href="mailto:contact@autodevjapan.com">contact@autodevjapan.com</a>
+      </p>
       <p>
         {messages.footerBeforeLicense}
         <a href="https://github.com/AutoDevJapan/GoDD-Design-Systems/blob/main/LICENSE">
