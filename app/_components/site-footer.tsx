@@ -16,6 +16,9 @@ export function SiteFooter({
         <a href="mailto:contact@autodevjapan.com">contact@autodevjapan.com</a>
       </p>
       <p>
+        <a href="https://autodevjapan.com/api/disclosure">{messages.footerDisclosureLabel}</a>
+      </p>
+      <p>
         {messages.footerBeforeLicense}
         <a href="https://github.com/AutoDevJapan/GoDD-Design-Systems/blob/main/LICENSE">
           MIT

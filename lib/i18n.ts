@@ -67,6 +67,7 @@ export type UiMessages = {
   chipAriaTemplate: string;
   footerOperatorLabel: string;
   footerContactLabel: string;
+  footerDisclosureLabel: string;
   footerBeforeLicense: string;
   footerAfterLicense: string;
   /** `{iso}` を置換する。 */
@@ -118,6 +119,7 @@ const ja: UiMessages = {
   chipAriaTemplate: "{label} {value}（{count} 件）",
   footerOperatorLabel: "事業者",
   footerContactLabel: "お問い合わせ",
+  footerDisclosureLabel: "事業者情報の開示請求",
   footerBeforeLicense: "© GoDD Design-Systems — License: ",
   footerAfterLicense:
     "。カラー軸は PCCS (日本色研配色体系) / JIS 無彩色、業種軸は日本標準産業分類 (JSIC) に基づく分類語彙を用いる。特定ブランドの色名・書体は含まない。",
@@ -170,6 +172,7 @@ const en: UiMessages = {
   chipAriaTemplate: "{label} {value} ({count})",
   footerOperatorLabel: "Operator",
   footerContactLabel: "Contact",
+  footerDisclosureLabel: "Business information disclosure request",
   footerBeforeLicense: "© GoDD Design-Systems — License: ",
   footerAfterLicense:
     ". Color axis uses PCCS / JIS achromatic terms; industry axis uses Japan Standard Industrial Classification (JSIC). No brand-specific color or typeface names.",
