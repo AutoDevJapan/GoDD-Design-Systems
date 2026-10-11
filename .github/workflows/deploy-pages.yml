@@ -35,6 +35,8 @@ concurrency:
 jobs:
   build:
     name: 静的エクスポート (Pages)
+    # 手動実行も既存 Prd の main に限定する。PR / タグ / 他ブランチは配備しない。
+    if: github.repository == 'AutoDevJapan/GoDD-Design-Systems' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -71,6 +73,7 @@ jobs:
 
   deploy:
     name: GitHub Pages へデプロイ
+    if: github.repository == 'AutoDevJapan/GoDD-Design-Systems' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment:

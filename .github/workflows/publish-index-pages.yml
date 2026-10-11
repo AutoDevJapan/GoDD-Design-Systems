@@ -16,6 +16,8 @@ concurrency:
 jobs:
   publish:
     name: 生成・検証・Release アップロード
+    # 公開カタログの正本を他ブランチの手動実行で置き換えない。
+    if: github.repository == 'AutoDevJapan/GoDD-Design-Systems' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
