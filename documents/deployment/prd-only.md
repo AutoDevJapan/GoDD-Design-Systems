@@ -73,3 +73,35 @@ GitHub の公式仕様:
 [Pages の配備元と環境制限](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)、
 [配備記録の削除](https://docs.github.com/en/rest/deployments/deployments)、
 [環境の削除](https://docs.github.com/en/rest/deployments/environments)。
+
+## 実施結果（2026-10-12、ToDo #2386）
+
+[PR #100](https://github.com/AutoDevJapan/GoDD-Design-Systems/pull/100) を
+別モデルの Must なし・同一 head の schema / gitleaks / CodeQL 成功後にマージした。
+マージ SHA は `31abea0bf96b1473093124cda961fcdca0bef7ba`。
+[main の CI](https://github.com/AutoDevJapan/GoDD-Design-Systems/actions/runs/38149742426) と
+[Pages 配備](https://github.com/AutoDevJapan/GoDD-Design-Systems/actions/runs/38149742447) も成功した。
+実 Pages 配備 ID `6997376918` は同じ SHA と既存 URL の success を返した。
+
+オーナーの既存 Chrome で日本語・英語カタログを確認した。
+検索 `0100` は 1,143 / 51,729 件、英語の `0100_ac-bk_cool` は 1 / 51,729 件。
+検索条件を付けた再読込と、公開 DESIGN.md 本文から戻った際の復元も成功した。
+ログイン・購入・個人データ保存は上記 source と画面に該当機能がなく N/A。
+URL による検索条件の保存・復元は実確認済み。
+
+旧 GitHub 環境 3 件と対応する配備記録 27 件を 204 応答で削除し、
+API の全件一覧で旧環境・旧配備が 0 件であることを確認した。
+残る環境は既存 Prd の `github-pages` と、人間承認設定を保った未使用の `production`。
+Pages の旧 Prd 配備履歴と公開データは保持している。
+旧 preview の 15 コミットは main の祖先ではないため、専用作業先に
+Git archive ref と検証済み Git bundle（1,862,177 bytes）を保全した。
+それらのコーパスのパスは現 main でも欠けておらず、今回の変更でコーパスは変更していない。
+
+旧環境を削除した後、main 以外の手動実行で Pages と Release のジョブが実際にスキップされた:
+[Pages の確認](https://github.com/AutoDevJapan/GoDD-Design-Systems/actions/runs/38150302811)、
+[Release の確認](https://github.com/AutoDevJapan/GoDD-Design-Systems/actions/runs/38150305326)。
+起動自体は可能だが公開ジョブは実行されない。
+この結果は GitHub の指定範囲の廃止であり、実 ID 未確認の Vercel 全体を削除したという意味ではない。
+
+製品台帳: `D:/CC/Tools/prd-only-2344/remaining-products/results/GoDD-Design-Systems.json`。
+親 ToDo #2344 の全製品完了を示すものではない。
