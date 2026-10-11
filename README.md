@@ -80,7 +80,7 @@ pages の再公開は Actions「Publish index pages」を手動実行する（PR
 |---|---|
 | URL | https://autodevjapan.github.io/GoDD-Design-Systems/ （英語 chrome: `/en/`） |
 | ワークフロー | `.github/workflows/deploy-pages.yml` |
-| トリガ | `main` への path-filtered push（`app/` `lib/` `public/` 等） / `workflow_dispatch` |
+| トリガ | `main` への path-filtered push（`app/` `lib/` `public/` 等） / `main` の `workflow_dispatch` のみ |
 | ビルド | `pnpm run build:pages`（`GODD_PAGES_BUILD=1` + `basePath=/GoDD-Design-Systems`） |
 | 成果物 | サイト chrome（`/`・`/en/`）。カタログは raw `index.json` をブラウザで取得。セル HTML は **サンプル 1 件のみ** |
 | セル本文 | カタログカードは `design-md/.../DESIGN.md` の GitHub blob へリンク |
@@ -89,6 +89,12 @@ Pages のソースは **GitHub Actions**（リポジトリ Settings → Pages �
 組織ポリシーで API からの有効化が拒否される場合は、初回だけ UI で Actions ソースを選ぶ。
 
 `index/pages` シャードの公開は本デプロイとは別（ADR-0003 / Release タグ `index-pages`）。
+手動公開も `main` のみ実行できる。他ブランチ・タグの実行はジョブをスキップする。
+
+既存 Pages はこのリポジトリの **Prd** として保持する。GitHub の環境名
+`github-pages` は配備先の識別子であり、Preview ではない。
+非 Prd の公開環境は作成しない。配備元・依存・旧環境の廃止手順は
+[Prd 配備の運用](documents/deployment/prd-only.md) を参照。
 
 ## 業種軸 (JSIC) の収録状況
 
