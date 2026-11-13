@@ -24,6 +24,12 @@ test("English export changes only root language and leaves Japanese and links in
       await writeFile(join(root, "en/index.html"), invalid);
       await assert.rejects(setEnglishExportLanguage(root), /language attribute/);
     }
+    const quoted = '<html data-note="hello > world" lang="ja"><body>English</body></html>';
+    await writeFile(join(root, "en/index.html"), quoted);
+    await setEnglishExportLanguage(root);
+    assert.equal(await readFile(join(root, "en/index.html"), "utf8"), quoted.replace('lang="ja"', 'lang="en"'));
+    await writeFile(join(root, "en/index.html"), '<html lang="ja" data-note="hello > world" lang="en">');
+    await assert.rejects(setEnglishExportLanguage(root), /language attribute/);
   } finally {
     await rm(root, { recursive: true });
   }

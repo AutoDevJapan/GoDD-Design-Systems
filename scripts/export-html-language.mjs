@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 export async function setEnglishExportLanguage(outputDirectory) {
   const path = resolve(outputDirectory, "en/index.html");
   const html = await readFile(path, "utf8");
-  const rootTags = [...html.matchAll(/<html\b[^>]*>/gi)];
+  const rootTags = [...html.matchAll(/<html\b(?:"[^"]*"|'[^']*'|[^'">])*>/gi)];
   const tag = rootTags[0]?.[0];
   // Match whole attribute names, not data-lang or lang text inside quoted values.
   const attributes = tag?.slice(5, -1).matchAll(/([^\s=/>]+)(?:\s*=\s*("[^"]*"|'[^']*'|[^\s>]+))?/g);
