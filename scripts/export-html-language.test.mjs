@@ -20,6 +20,10 @@ test("English export changes only root language and leaves Japanese and links in
     assert.equal(await readFile(join(root, "en/index.html"), "utf8"), en.replace('lang="ja"', 'lang="en"'));
     await writeFile(join(root, "en/index.html"), "<body>broken export</body>");
     await assert.rejects(setEnglishExportLanguage(root), /language attribute/);
+    for (const invalid of ['<html data-lang="ja">', '<html lang="ja" lang="en">']) {
+      await writeFile(join(root, "en/index.html"), invalid);
+      await assert.rejects(setEnglishExportLanguage(root), /language attribute/);
+    }
   } finally {
     await rm(root, { recursive: true });
   }
