@@ -3,22 +3,32 @@
 // 51k セル HTML / 全件 OG は生成せず、サイト chrome（`/` `/en/`）+ カタログのみ。
 
 import { spawnSync } from "node:child_process";
+import { readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { setEnglishExportLanguage } from "./export-html-language.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "..");
 const require = createRequire(import.meta.url);
 
-process.env.GODD_PAGES_BUILD = "1";
-process.env.NEXT_PUBLIC_SITE_URL ??=
-  "https://autodevjapan.github.io/GoDD-Design-Systems";
-// output:export は空の generateStaticParams を拒否するため最低 1。全件は出さない。
-process.env.GODD_STATIC_CELL_LIMIT ??= "1";
-process.env.GODD_OG_CELL_LIMIT ??= "0";
-process.env.NEXT_TELEMETRY_DISABLED ??= "1";
+/** The English route must declare its language before client hydration. */
+export async function setEnglishExportLanguage(outputDirectory) {
+  const path = resolve(outputDirectory, "en/index.html");
+  const html = await readFile(path, "utf8");
+  const rootTags = [...html.matchAll(/<html\b(?:"[^"]*"|'[^']*'|[^'">])*>/gi)];
+  const tag = rootTags[0]?.[0];
+  // Match whole attribute names, not data-lang or lang text inside quoted values.
+  const attributes = tag?.slice(5, -1).matchAll(/([^\s=/>]+)(?:\s*=\s*("[^"]*"|'[^']*'|[^\s>]+))?/g);
+  const languages = attributes ? [...attributes].filter((attribute) => attribute[1].toLowerCase() === "lang") : [];
+  if (rootTags.length !== 1 || languages.length !== 1 || !/^"(?:ja|en)"$/.test(languages[0][2] ?? "")) {
+    throw new Error("English export has no supported html language attribute");
+  }
+  const attribute = languages[0];
+  const valueOffset = rootTags[0].index + 5 + attribute.index + attribute[0].lastIndexOf(attribute[2]);
+  const updated = html.slice(0, valueOffset) + '"en"' + html.slice(valueOffset + attribute[2].length);
+  if (updated !== html) await writeFile(path, updated, "utf8");
+}
 
 function run(cmd, args) {
   const r = spawnSync(cmd, args, {
@@ -39,24 +49,38 @@ function run(cmd, args) {
   }
 }
 
-// Next が typescript を解決できることを先に確認（未解決だと検証段階で無言 fail しうる）。
-try {
-  const tsPath = require.resolve("typescript/package.json", { paths: [root] });
-  const { version } = require(tsPath);
-  console.log(`[build-pages] typescript resolved: v${version} @ ${tsPath}`);
-} catch (err) {
-  console.error("[build-pages] typescript resolve failed:", err);
-  process.exit(1);
+async function buildPages() {
+  process.env.GODD_PAGES_BUILD = "1";
+  process.env.NEXT_PUBLIC_SITE_URL ??=
+    "https://autodevjapan.github.io/GoDD-Design-Systems";
+  // output:export は空の generateStaticParams を拒否するため最低 1。全件は出さない。
+  process.env.GODD_STATIC_CELL_LIMIT ??= "1";
+  process.env.GODD_OG_CELL_LIMIT ??= "0";
+  process.env.NEXT_TELEMETRY_DISABLED ??= "1";
+
+  // Next が typescript を解決できることを先に確認（未解決だと検証段階で無言 fail しうる）。
+  try {
+    const tsPath = require.resolve("typescript/package.json", { paths: [root] });
+    const { version } = require(tsPath);
+    console.log(`[build-pages] typescript resolved: v${version} @ ${tsPath}`);
+  } catch (err) {
+    console.error("[build-pages] typescript resolve failed:", err);
+    process.exit(1);
+  }
+
+  console.log(
+    `[build-pages] GODD_PAGES_BUILD=1 SITE_URL=${process.env.NEXT_PUBLIC_SITE_URL} ` +
+      `STATIC_CELL_LIMIT=${process.env.GODD_STATIC_CELL_LIMIT} OG_CELL_LIMIT=${process.env.GODD_OG_CELL_LIMIT}`,
+  );
+
+  run("node", ["scripts/build-og.mjs"]);
+  // next バイナリを直接叩き、pnpm exec 経由の終了コード握りつぶしを避ける。
+  run(process.execPath, [resolve(root, "node_modules/next/dist/bin/next"), "build"]);
+  await setEnglishExportLanguage(resolve(root, "out"));
+
+  console.log("[build-pages] OK → out/");
 }
 
-console.log(
-  `[build-pages] GODD_PAGES_BUILD=1 SITE_URL=${process.env.NEXT_PUBLIC_SITE_URL} ` +
-    `STATIC_CELL_LIMIT=${process.env.GODD_STATIC_CELL_LIMIT} OG_CELL_LIMIT=${process.env.GODD_OG_CELL_LIMIT}`,
-);
-
-run("node", ["scripts/build-og.mjs"]);
-// next バイナリを直接叩き、pnpm exec 経由の終了コード握りつぶしを避ける。
-run(process.execPath, [resolve(root, "node_modules/next/dist/bin/next"), "build"]);
-await setEnglishExportLanguage(resolve(root, "out"));
-
-console.log("[build-pages] OK → out/");
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await buildPages();
+}

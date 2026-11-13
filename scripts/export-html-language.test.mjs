@@ -1,9 +1,10 @@
 import { test } from "node:test";
+import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 import { mkdtemp, mkdir, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { setEnglishExportLanguage } from "./export-html-language.mjs";
+import { setEnglishExportLanguage } from "./build-pages.mjs";
 
 test("English export changes only root language and leaves Japanese and links intact", async () => {
   const root = await mkdtemp(join(tmpdir(), "ds-export-language-"));
@@ -33,4 +34,26 @@ test("English export changes only root language and leaves Japanese and links in
   } finally {
     await rm(root, { recursive: true });
   }
+});
+
+test("build helper import performs no build or environment mutation", () => {
+  const moduleUrl = new URL("./build-pages.mjs", import.meta.url).href;
+  const program = `
+    import assert from "node:assert/strict";
+    import childProcess from "node:child_process";
+    import { syncBuiltinESMExports } from "node:module";
+    childProcess.spawnSync = () => { throw new Error("unexpected build during import"); };
+    syncBuiltinESMExports();
+    const before = JSON.stringify(process.env);
+    const module = await import(${JSON.stringify(moduleUrl)});
+    assert.equal(typeof module.setEnglishExportLanguage, "function");
+    assert.equal(JSON.stringify(process.env), before);
+  `;
+  const result = spawnSync(process.execPath, ["--input-type=module", "--eval", program], {
+    encoding: "utf8",
+    timeout: 10_000,
+  });
+  assert.ifError(result.error);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout, "");
 });
