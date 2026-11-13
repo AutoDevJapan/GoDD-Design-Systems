@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { setEnglishExportLanguage } from "./export-html-language.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "..");
@@ -56,5 +57,6 @@ console.log(
 run("node", ["scripts/build-og.mjs"]);
 // next バイナリを直接叩き、pnpm exec 経由の終了コード握りつぶしを避ける。
 run(process.execPath, [resolve(root, "node_modules/next/dist/bin/next"), "build"]);
+await setEnglishExportLanguage(resolve(root, "out"));
 
 console.log("[build-pages] OK → out/");
