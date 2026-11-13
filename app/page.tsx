@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { loadIndex, loadIndexSummary } from "@/lib/catalog";
 import { SiteFooter } from "@/app/_components/site-footer";
 import { LocaleSwitcher } from "@/app/_components/locale-switcher";
+import { LocaleHtmlLang } from "@/app/_components/locale-html-lang";
 import {
   CatalogExplorer,
   type CatalogCell,
@@ -61,6 +62,7 @@ export default function HomePage() {
 
   return (
     <div className="wrap">
+      <LocaleHtmlLang locale={locale} />
       <header className="site-header">
         <div className="site-header-top">
           <h1>GoDD Design-Systems</h1>

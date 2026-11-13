@@ -42,6 +42,9 @@ function want(file, src, needle, label) {
 
 // --- layout: lang / スキップリンク -------------------------------------------
 const layout = read("app/layout.tsx");
+for (const page of ["app/page.tsx", "app/en/page.tsx"]) {
+  want(page, read(page), "<LocaleHtmlLang locale={locale}", "言語切替後の html lang 復元");
+}
 want("app/layout.tsx", layout, 'lang="ja"', 'lang="ja" 属性');
 want("app/layout.tsx", layout, "SkipLink", "スキップリンク (SkipLink)");
 const skipLink = read("app/_components/skip-link.tsx");
