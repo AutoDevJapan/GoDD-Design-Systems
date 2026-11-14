@@ -14,6 +14,47 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  pages-build:
+    name: Pages 静的ビルド (配備なし)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: ビルド入力の変更を確認
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          changed=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- app src pages lib public scripts package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ':(glob)*.js' ':(glob)*.mjs' ':(glob)*.cjs' ':(glob)*.ts' ':(glob)*.tsx' ':(glob)*.jsx' ':(glob)*.json' ':(glob)*.jsonc' taxonomy.md .github/workflows/ci.yml .github/workflows/deploy-pages.yml)
+          if [ -n "$changed" ]; then
+            echo 'build=true' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: pnpm/action-setup@v6
+        if: steps.scope.outputs.build == 'true'
+      - uses: actions/setup-node@v7
+        if: steps.scope.outputs.build == 'true'
+        with:
+          node-version: "22"
+          cache: pnpm
+      - name: 依存インストール
+        if: steps.scope.outputs.build == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: カタログ全件のトレースを除外
+        if: steps.scope.outputs.build == 'true'
+        run: rm -rf -- design-md
+      - name: Pages 向けビルドと出力確認
+        if: steps.scope.outputs.build == 'true'
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: |
+          pnpm run build:pages
+          test -s out/index.html
+          test -s out/en/index.html
+
   schema:
     name: schema 検証 (index.json)
     runs-on: ubuntu-latest
