@@ -92,24 +92,58 @@ function queryMatches(
   return haystacks.some((h) => h.toLowerCase().includes(needle));
 }
 
-/**
- * `exceptAxis` を除く全軸 + キーワードでの一致判定。
- * ファセット件数（ある軸の候補が示す残件数）を、他軸の絞り込みを反映して
- * 算出するために使う。`exceptAxis` が null なら全軸で判定する。
- */
-function matchesExcept(
-  cell: CatalogCell,
+
+type FacetResult = Record<Axis, { value: string; count: number }[]>;
+
+function emptyFacetCounts(): Record<Axis, Map<string, number>> {
+  return { jsic: new Map(), color: new Map(), mood: new Map(), tag: new Map() };
+}
+
+function emptyFacetResult(): FacetResult {
+  return { jsic: [], color: [], mood: [], tag: [] };
+}
+
+/** 全体の候補値と各軸の残件数を、同じセルの一致判定から計算する。 */
+export function computeCatalogProjection(
+  cells: CatalogCell[],
   selected: Selected,
   query: string,
-  exceptAxis: Axis | null,
   locale: Locale,
   labels: TaxonomyLabelMaps,
-): boolean {
-  for (const key of AXIS_KEYS) {
-    if (key === exceptAxis) continue;
-    if (!axisMatches(cell, key, selected[key])) return false;
+): { filtered: CatalogCell[]; facets: FacetResult } {
+  const filtered = cells.slice(0, 0);
+  const counts = emptyFacetCounts();
+  for (const cell of cells) {
+    for (const key of AXIS_KEYS) {
+      for (const value of axisValues(cell, key)) {
+        if (!counts[key].has(value)) counts[key].set(value, 0);
+      }
+    }
+    const matches = {
+      jsic: axisMatches(cell, "jsic", selected.jsic),
+      color: axisMatches(cell, "color", selected.color),
+      mood: axisMatches(cell, "mood", selected.mood),
+      tag: axisMatches(cell, "tag", selected.tag),
+    };
+    let failures = 0;
+    for (const key of AXIS_KEYS) if (!matches[key]) failures++;
+    if (failures > 1 || !queryMatches(cell, query, locale, labels)) continue;
+    if (failures === 0) filtered.push(cell);
+    for (const key of AXIS_KEYS) {
+      if (failures === 0 || !matches[key]) {
+        for (const value of new Set(axisValues(cell, key))) {
+          counts[key].set(value, (counts[key].get(value) ?? 0) + 1);
+        }
+      }
+    }
   }
-  return queryMatches(cell, query, locale, labels);
+  const facets = emptyFacetResult();
+  for (const key of AXIS_KEYS) {
+    facets[key] = [...counts[key].entries()]
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
+  }
+  return { filtered, facets };
 }
 
 // --- URL クエリ同期（静的エクスポートと両立するため History API を直接使う） ---
@@ -248,47 +282,10 @@ export function CatalogExplorer({
     [selected, query],
   );
 
-  // 絞り込み後のセル一覧。
-  const filtered = useMemo(
-    () =>
-      cells.filter((c) =>
-        matchesExcept(c, selected, query, null, locale, taxonomyLabels),
-      ),
+  const { filtered, facets } = useMemo(
+    () => computeCatalogProjection(cells, selected, query, locale, taxonomyLabels),
     [cells, selected, query, locale, taxonomyLabels],
   );
-
-  // 軸ごとのファセット候補と、他軸フィルタを反映した残件数。
-  // 件数 0（かつ未選択）の候補は選べないものとして無効化する。
-  const facets = useMemo(() => {
-    const result: Record<Axis, { value: string; count: number }[]> = {
-      jsic: [],
-      color: [],
-      mood: [],
-      tag: [],
-    };
-    for (const key of AXIS_KEYS) {
-      const counts = new Map<string, number>();
-      // 全セルから当該軸の候補値を洗い出す（母集合は固定）。
-      for (const cell of cells) {
-        for (const v of axisValues(cell, key)) {
-          if (!counts.has(v)) counts.set(v, 0);
-        }
-      }
-      // 他軸フィルタ + 検索を満たすセルで件数を数える。
-      for (const cell of cells) {
-        if (!matchesExcept(cell, selected, query, key, locale, taxonomyLabels)) {
-          continue;
-        }
-        for (const v of new Set(axisValues(cell, key))) {
-          counts.set(v, (counts.get(v) ?? 0) + 1);
-        }
-      }
-      result[key] = [...counts.entries()]
-        .map(([value, count]) => ({ value, count }))
-        .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
-    }
-    return result;
-  }, [cells, selected, query, locale, taxonomyLabels]);
 
   return (
     <>
