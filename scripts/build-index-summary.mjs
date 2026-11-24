@@ -6,6 +6,10 @@
 import { mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  preserveJsonNumber,
+  serializeJsonNumber,
+} from "./index-page-json-numbers.mjs";
 
 const PAGE_SIZE = 1000;
 const SUMMARY_VERSION = 1;
@@ -19,9 +23,9 @@ const pagesDir = resolve(root, "index", "pages");
 
 const writePages = process.argv.includes("--pages");
 
-function readJson(path) {
+function readJson(path, reviver) {
   try {
-    return JSON.parse(readFileSync(path, "utf8"));
+    return JSON.parse(readFileSync(path, "utf8"), reviver);
   } catch (err) {
     console.error(`[build-index-summary] 読込/パース失敗: ${path}\n  ${err.message}`);
     process.exit(1);
@@ -39,7 +43,7 @@ function tally(values) {
     .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
 }
 
-const index = readJson(indexPath);
+const index = readJson(indexPath, writePages ? preserveJsonNumber : undefined);
 const entries = Array.isArray(index?.entries) ? index.entries : null;
 if (!entries) {
   console.error("[build-index-summary] index.json に entries 配列がありません");
@@ -97,7 +101,11 @@ for (let page = 0; page < pageCount; page++) {
     entries: slice,
   };
   const out = resolve(pagesDir, `${page}.json`);
-  writeFileSync(out, `${JSON.stringify(pageDoc)}\n`, "utf8");
+  writeFileSync(
+    out,
+    `${JSON.stringify(pageDoc, serializeJsonNumber)}\n`,
+    "utf8",
+  );
 }
 
 console.log(`[build-index-summary] wrote ${pageCount} pages under ${pagesDir}`);

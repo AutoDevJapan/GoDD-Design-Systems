@@ -5,8 +5,13 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
+import {
+  jsonNumberForComparison,
+  preserveJsonNumber,
+} from "./index-page-json-numbers.mjs";
 
 const PAGE_SIZE = 1000;
 
@@ -17,9 +22,9 @@ const summaryPath = resolve(root, "index-summary.json");
 const indexPath = resolve(root, "index.json");
 const pagesDir = resolve(root, "index", "pages");
 
-function readJson(path) {
+function readJson(path, reviver) {
   try {
-    return JSON.parse(readFileSync(path, "utf8"));
+    return JSON.parse(readFileSync(path, "utf8"), reviver);
   } catch (err) {
     console.error(`[validate-index-pages] 読込/パース失敗: ${path}\n  ${err.message}`);
     process.exit(1);
@@ -41,7 +46,7 @@ if (pageFiles.length === 0) {
 
 const schema = readJson(schemaPath);
 const summary = readJson(summaryPath);
-const index = readJson(indexPath);
+const index = readJson(indexPath, preserveJsonNumber);
 const entries = Array.isArray(index?.entries) ? index.entries : [];
 
 // entries.items は index entry の完全 schema を持たず required のみ
@@ -55,6 +60,7 @@ const expectedPageCount =
   summary.pageCount ??
   (entries.length === 0 ? 0 : Math.ceil(entries.length / PAGE_SIZE));
 const expectedEntryCount = summary.entryCount ?? entries.length;
+const expectedVersion = schema.properties.version.const;
 
 if (pageFiles.length !== expectedPageCount) {
   errors.push(
@@ -71,35 +77,55 @@ for (let page = 0; page < expectedPageCount; page++) {
     continue;
   }
 
-  const doc = readJson(path);
+  const doc = readJson(path, preserveJsonNumber);
   if (!validate(doc)) {
     for (const e of validate.errors ?? []) {
       errors.push(`page ${page} schema: ${e.instancePath || "/"} ${e.message}`);
     }
   }
 
-  if (doc.page !== page) {
-    errors.push(`page ${page}: doc.page=${doc.page} がファイル番号と不一致`);
+  // Ajv only sees the rounded Number. Refuse a different exact version once.
+  if (
+    doc.version === expectedVersion &&
+    jsonNumberForComparison(doc, "version") !== expectedVersion
+  ) {
+    errors.push(`page ${page} schema: /version must be equal to constant`);
   }
-  if (doc.pageSize !== PAGE_SIZE) {
+
+  const docPage = jsonNumberForComparison(doc, "page");
+  if (docPage !== page) {
+    errors.push(`page ${page}: doc.page=${docPage} がファイル番号と不一致`);
+  }
+  if (jsonNumberForComparison(doc, "pageSize") !== PAGE_SIZE) {
     errors.push(`page ${page}: pageSize は ${PAGE_SIZE} である必要があります`);
   }
 
   const slice = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-  if (doc.entryCount !== slice.length) {
+  const docEntryCount = jsonNumberForComparison(doc, "entryCount");
+  if (docEntryCount !== slice.length) {
     errors.push(
-      `page ${page}: entryCount (${doc.entryCount}) が期待スライス長 (${slice.length}) と不一致`,
+      `page ${page}: entryCount (${docEntryCount}) が期待スライス長 (${slice.length}) と不一致`,
     );
   }
   if (!Array.isArray(doc.entries) || doc.entries.length !== slice.length) {
     errors.push(`page ${page}: entries.length がスライス長と不一致`);
   } else {
-    for (let i = 0; i < slice.length; i++) {
-      if (doc.entries[i]?.id !== slice[i]?.id) {
-        errors.push(
-          `page ${page}: entries[${i}].id (${doc.entries[i]?.id}) が index 順と不一致 (expected ${slice[i]?.id})`,
-        );
-        break;
+    // Preserve the first ID diagnostic even if an earlier entry differs.
+    const idMismatch = slice.findIndex(
+      (entry, i) => doc.entries[i]?.id !== entry?.id,
+    );
+    if (idMismatch !== -1) {
+      const actual = doc.entries[idMismatch]?.id;
+      const expected = slice[idMismatch]?.id;
+      errors.push(
+        `page ${page}: entries[${idMismatch}].id (${actual}) が index 順と不一致 (expected ${expected})`,
+      );
+    } else {
+      const mismatch = slice.findIndex(
+        (entry, i) => !isDeepStrictEqual(doc.entries[i], entry),
+      );
+      if (mismatch !== -1) {
+        errors.push(`page ${page}: entries[${mismatch}] が index.json の entry と不一致`);
       }
     }
   }
