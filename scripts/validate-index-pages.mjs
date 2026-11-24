@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
+import { preserveJsonNumber } from "./index-page-json-numbers.mjs";
 
 const PAGE_SIZE = 1000;
 
@@ -18,9 +19,9 @@ const summaryPath = resolve(root, "index-summary.json");
 const indexPath = resolve(root, "index.json");
 const pagesDir = resolve(root, "index", "pages");
 
-function readJson(path) {
+function readJson(path, reviver) {
   try {
-    return JSON.parse(readFileSync(path, "utf8"));
+    return JSON.parse(readFileSync(path, "utf8"), reviver);
   } catch (err) {
     console.error(`[validate-index-pages] 読込/パース失敗: ${path}\n  ${err.message}`);
     process.exit(1);
@@ -42,7 +43,7 @@ if (pageFiles.length === 0) {
 
 const schema = readJson(schemaPath);
 const summary = readJson(summaryPath);
-const index = readJson(indexPath);
+const index = readJson(indexPath, preserveJsonNumber);
 const entries = Array.isArray(index?.entries) ? index.entries : [];
 
 // entries.items は index entry の完全 schema を持たず required のみ
@@ -72,7 +73,7 @@ for (let page = 0; page < expectedPageCount; page++) {
     continue;
   }
 
-  const doc = readJson(path);
+  const doc = readJson(path, preserveJsonNumber);
   if (!validate(doc)) {
     for (const e of validate.errors ?? []) {
       errors.push(`page ${page} schema: ${e.instancePath || "/"} ${e.message}`);
@@ -95,18 +96,22 @@ for (let page = 0; page < expectedPageCount; page++) {
   if (!Array.isArray(doc.entries) || doc.entries.length !== slice.length) {
     errors.push(`page ${page}: entries.length がスライス長と不一致`);
   } else {
-    for (let i = 0; i < slice.length; i++) {
-      if (doc.entries[i]?.id !== slice[i]?.id) {
-        errors.push(
-          `page ${page}: entries[${i}].id (${doc.entries[i]?.id}) が index 順と不一致 (expected ${slice[i]?.id})`,
-        );
-        break;
-      }
-      if (!isDeepStrictEqual(doc.entries[i], slice[i])) {
-        errors.push(
-          `page ${page}: entries[${i}] が index.json の entry と不一致`,
-        );
-        break;
+    // Preserve the first ID diagnostic even if an earlier entry differs.
+    const idMismatch = slice.findIndex(
+      (entry, i) => doc.entries[i]?.id !== entry?.id,
+    );
+    if (idMismatch !== -1) {
+      const actual = doc.entries[idMismatch]?.id;
+      const expected = slice[idMismatch]?.id;
+      errors.push(
+        `page ${page}: entries[${idMismatch}].id (${actual}) が index 順と不一致 (expected ${expected})`,
+      );
+    } else {
+      const mismatch = slice.findIndex(
+        (entry, i) => !isDeepStrictEqual(doc.entries[i], entry),
+      );
+      if (mismatch !== -1) {
+        errors.push(`page ${page}: entries[${mismatch}] が index.json の entry と不一致`);
       }
     }
   }

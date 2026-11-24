@@ -4,6 +4,7 @@ import {
   copyFileSync,
   mkdirSync,
   mkdtempSync,
+  readFileSync,
   realpathSync,
   rmSync,
   writeFileSync,
@@ -15,6 +16,8 @@ import { fileURLToPath } from "node:url";
 const repoRoot = realpathSync(fileURLToPath(new URL("../", import.meta.url)));
 const schemaPath = "documents/schema/index-page.schema.json";
 const validatorPath = "scripts/validate-index-pages.mjs";
+const builderPath = "scripts/build-index-summary.mjs";
+const numberCodecPath = "scripts/index-page-json-numbers.mjs";
 const generatedAt = "2026-01-01T00:00:00Z";
 
 function cell(color, title, hashChar) {
@@ -33,7 +36,7 @@ function cell(color, title, hashChar) {
   };
 }
 
-function runValidator(t, change = () => {}) {
+function createFixture(t) {
   // Keep the fixture under the checkout so the copied CLI resolves the normal
   // installed dependencies. The CLI resolves its catalog relative to its script.
   const fixtureRoot = mkdtempSync(join(repoRoot, ".index-pages-test-"));
@@ -45,10 +48,31 @@ function runValidator(t, change = () => {}) {
   for (const dir of ["scripts", "documents/schema", "index/pages"]) {
     mkdirSync(join(fixtureRoot, dir), { recursive: true });
   }
-  for (const path of [validatorPath, schemaPath]) {
+  for (const path of [validatorPath, schemaPath, numberCodecPath]) {
     copyFileSync(join(repoRoot, path), join(fixtureRoot, path));
   }
+  return fixtureRoot;
+}
 
+function runFixtureScript(fixtureRoot, script, ...args) {
+  const result = spawnSync(process.execPath, [join(fixtureRoot, script), ...args], {
+    cwd: fixtureRoot,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+    timeout: 10_000,
+    maxBuffer: 64 * 1024,
+  });
+  assert.ifError(result.error);
+  assert.equal(result.signal, null);
+  return result;
+}
+
+function writeJson(fixtureRoot, path, value) {
+  writeFileSync(join(fixtureRoot, path), JSON.stringify(value) + "\n", "utf8");
+}
+
+function runValidator(t, change = () => {}, { checkNumberOnly = false } = {}) {
+  const fixtureRoot = createFixture(t);
   const entries = [cell("blue", "Blue cell", "a"), cell("red", "Red cell", "b")];
   const summary = { pageCount: 1, entryCount: entries.length };
   const page = {
@@ -59,26 +83,33 @@ function runValidator(t, change = () => {}) {
     generatedAt,
     entries: structuredClone(entries),
   };
-  change({ page, summary });
+  change({ entries, page, summary });
 
   for (const [path, object] of [
     ["index.json", { version: 1, generatedAt, entries }],
     ["index-summary.json", summary],
     ["index/pages/0.json", page],
   ]) {
-    writeFileSync(join(fixtureRoot, path), JSON.stringify(object) + "\n", "utf8");
+    writeJson(fixtureRoot, path, object);
   }
 
-  const result = spawnSync(process.execPath, [join(fixtureRoot, validatorPath)], {
-    cwd: fixtureRoot,
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-    timeout: 10_000,
-    maxBuffer: 64 * 1024,
-  });
-  assert.ifError(result.error);
-  assert.equal(result.signal, null);
+  const result = runFixtureScript(fixtureRoot, validatorPath);
+  if (checkNumberOnly) expectSuccess(runWithoutExactNumbers(fixtureRoot));
   return result;
+}
+
+function runWithoutExactNumbers(fixtureRoot) {
+  // Restore only the previous Number-based JSON read, in an owned fixture.
+  const source = readFileSync(join(fixtureRoot, validatorPath), "utf8");
+  const parts = source.split('JSON.parse(readFileSync(path, "utf8"), reviver)');
+  assert.equal(parts.length, 2, "expected exactly one JSON reader to replace");
+  const counterPath = "scripts/validate-index-pages-without-exact-numbers.mjs";
+  writeFileSync(
+    join(fixtureRoot, counterPath),
+    parts.join('JSON.parse(readFileSync(path, "utf8"))'),
+    { encoding: "utf8", flag: "wx" },
+  );
+  return runFixtureScript(fixtureRoot, counterPath);
 }
 
 function expectSuccess({ status, stdout, stderr }) {
@@ -201,5 +232,107 @@ for (const [description, change, diagnostic] of refusals) {
     assert.equal(status, 1, "stdout:\n" + stdout + "\nstderr:\n" + stderr);
     assert.equal(stdout, "");
     assert.match(stderr, diagnostic);
+  });
+}
+
+function withVariant(entry, token, suffix) {
+  const variant = JSON.rawJSON(token);
+  if (suffix === undefined) return { ...entry, variant };
+  return {
+    ...entry,
+    id: entry.id + "_v" + suffix,
+    path: entry.path.replace("DESIGN.md", "v" + suffix + "/DESIGN.md"),
+    variant,
+  };
+}
+
+function setVariantPair(fixture, position, indexToken, pageToken, suffix) {
+  const entry = withVariant(fixture.entries[position], indexToken, suffix);
+  fixture.entries[position] = entry;
+  fixture.page.entries[position] = { ...entry, variant: JSON.rawJSON(pageToken) };
+}
+
+function variantTokens(fixtureRoot, path) {
+  const original = readFileSync(join(fixtureRoot, path), "utf8");
+  return JSON.parse(original, (key, value, context) =>
+    key === "variant" ? context.source : value,
+  ).entries.map((entry) => entry.variant);
+}
+
+function expectRefusal({ status, stdout, stderr }, diagnostic) {
+  assert.equal(status, 1, "stdout:\n" + stdout + "\nstderr:\n" + stderr);
+  assert.equal(stdout, "");
+  assert.match(stderr, diagnostic);
+}
+
+test("accepts the builder's serialized page and preserves its large variant", (t) => {
+  const fixtureRoot = createFixture(t);
+  copyFileSync(join(repoRoot, builderPath), join(fixtureRoot, builderPath));
+  const large = "9007199254740993";
+  const entries = [
+    withVariant(cell("blue", "Blue cell", "a"), "-0"),
+    withVariant(cell("red", "Red cell", "b"), large, large),
+  ];
+  writeJson(fixtureRoot, "index.json", { version: 1, generatedAt, entries });
+  assert.deepEqual(variantTokens(fixtureRoot, "index.json"), ["-0", large]);
+
+  const build = runFixtureScript(fixtureRoot, builderPath, "--pages");
+  assert.equal(build.status, 0, build.stderr);
+  assert.equal(build.stderr, "");
+  assert.deepEqual(variantTokens(fixtureRoot, "index/pages/0.json"), ["0", large]);
+
+  expectSuccess(runFixtureScript(fixtureRoot, validatorPath));
+  expectRefusal(runWithoutExactNumbers(fixtureRoot), entryMismatch);
+});
+
+test("accepts equal integer, decimal and exponent spellings", (t) => {
+  expectSuccess(runValidator(t, (fixture) => {
+    setVariantPair(fixture, 0, "1", "1.0", "1");
+    setVariantPair(fixture, 1, "1.0", "10E-1", "1");
+  }));
+});
+
+test("accepts equivalent large numbers written with different exponents", (t) => {
+  expectSuccess(runValidator(t, (fixture) => {
+    const large = "9007199254740993";
+    setVariantPair(fixture, 0, large, large + "0e-1", large);
+  }));
+});
+
+for (const [description, indexToken, pageToken] of [
+  ["a fractional value hidden by Number rounding", "1", "1.0000000000000001"],
+  ["a neighboring large integer hidden by Number rounding", "9007199254740992", "9007199254740993"],
+]) {
+  test("rejects " + description, (t) => {
+    // These are distinct source tokens but the old comparator sees one Number.
+    assert.notEqual(indexToken, pageToken);
+    assert.equal(Number(indexToken), Number(pageToken));
+    const result = runValidator(t, (fixture) => {
+      setVariantPair(fixture, 0, indexToken, pageToken, indexToken);
+    }, { checkNumberOnly: true });
+    expectRefusal(result, entryMismatch);
+  });
+}
+
+test("compares very large exponents without rounding or expansion", (t) => {
+  const exponent = "9".repeat(80);
+  const minusOne = "9".repeat(79) + "8";
+  const makeEquivalent = (fixture) => {
+    setVariantPair(fixture, 0, "1e" + exponent, "10e" + minusOne);
+  };
+  expectSuccess(runValidator(t, makeEquivalent));
+  expectRefusal(runValidator(t, (fixture) => {
+    setVariantPair(fixture, 0, "1e" + exponent, "1e" + minusOne);
+  }, { checkNumberOnly: true }), entryMismatch);
+});
+
+for (const [titleIndex, idIndex] of [[0, 1], [1, 0]]) {
+  test("reports ID mismatch at " + idIndex + " with a title mismatch at " + titleIndex, (t) => {
+    const result = runValidator(t, ({ page }) => {
+      page.entries[titleIndex].title = "Other title";
+      page.entries[idIndex].id = "1234_green_calm";
+    });
+    expectRefusal(result, new RegExp("page 0: entries\\[" + idIndex + "\\]\\.id"));
+    assert.doesNotMatch(result.stderr, /が index\.json の entry と不一致/);
   });
 }
