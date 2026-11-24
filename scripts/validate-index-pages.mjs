@@ -5,6 +5,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 
@@ -98,6 +99,12 @@ for (let page = 0; page < expectedPageCount; page++) {
       if (doc.entries[i]?.id !== slice[i]?.id) {
         errors.push(
           `page ${page}: entries[${i}].id (${doc.entries[i]?.id}) が index 順と不一致 (expected ${slice[i]?.id})`,
+        );
+        break;
+      }
+      if (!isDeepStrictEqual(doc.entries[i], slice[i])) {
+        errors.push(
+          `page ${page}: entries[${i}] が index.json の entry と不一致`,
         );
         break;
       }
