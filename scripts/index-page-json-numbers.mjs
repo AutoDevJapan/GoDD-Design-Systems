@@ -36,6 +36,11 @@ export function preserveJsonNumber(key, value, context) {
   return value === 0 ? 0 : value;
 }
 
+export function jsonNumberForComparison(object, key) {
+  // A retained decimal differs from the rounded value and cannot match a Number.
+  return object[exactNumbers]?.get(key) ?? object[key];
+}
+
 export function serializeJsonNumber(key, value) {
   const exact = this[exactNumbers]?.get(key);
   return exact === undefined ? value : JSON.rawJSON(exact);

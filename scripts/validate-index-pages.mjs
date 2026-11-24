@@ -8,7 +8,10 @@ import { fileURLToPath } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
-import { preserveJsonNumber } from "./index-page-json-numbers.mjs";
+import {
+  jsonNumberForComparison,
+  preserveJsonNumber,
+} from "./index-page-json-numbers.mjs";
 
 const PAGE_SIZE = 1000;
 
@@ -57,6 +60,7 @@ const expectedPageCount =
   summary.pageCount ??
   (entries.length === 0 ? 0 : Math.ceil(entries.length / PAGE_SIZE));
 const expectedEntryCount = summary.entryCount ?? entries.length;
+const expectedVersion = schema.properties.version.const;
 
 if (pageFiles.length !== expectedPageCount) {
   errors.push(
@@ -80,17 +84,27 @@ for (let page = 0; page < expectedPageCount; page++) {
     }
   }
 
-  if (doc.page !== page) {
-    errors.push(`page ${page}: doc.page=${doc.page} がファイル番号と不一致`);
+  // Ajv only sees the rounded Number. Refuse a different exact version once.
+  if (
+    doc.version === expectedVersion &&
+    jsonNumberForComparison(doc, "version") !== expectedVersion
+  ) {
+    errors.push(`page ${page} schema: /version must be equal to constant`);
   }
-  if (doc.pageSize !== PAGE_SIZE) {
+
+  const docPage = jsonNumberForComparison(doc, "page");
+  if (docPage !== page) {
+    errors.push(`page ${page}: doc.page=${docPage} がファイル番号と不一致`);
+  }
+  if (jsonNumberForComparison(doc, "pageSize") !== PAGE_SIZE) {
     errors.push(`page ${page}: pageSize は ${PAGE_SIZE} である必要があります`);
   }
 
   const slice = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-  if (doc.entryCount !== slice.length) {
+  const docEntryCount = jsonNumberForComparison(doc, "entryCount");
+  if (docEntryCount !== slice.length) {
     errors.push(
-      `page ${page}: entryCount (${doc.entryCount}) が期待スライス長 (${slice.length}) と不一致`,
+      `page ${page}: entryCount (${docEntryCount}) が期待スライス長 (${slice.length}) と不一致`,
     );
   }
   if (!Array.isArray(doc.entries) || doc.entries.length !== slice.length) {

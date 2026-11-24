@@ -336,3 +336,43 @@ for (const [titleIndex, idIndex] of [[0, 1], [1, 0]]) {
     assert.doesNotMatch(result.stderr, /が index\.json の entry と不一致/);
   });
 }
+
+test("accepts equivalent exponent spellings for page integers", (t) => {
+  expectSuccess(runValidator(t, ({ page }) => {
+    page.version = JSON.rawJSON("10e-1");
+    page.page = JSON.rawJSON("-0e0");
+    page.pageSize = JSON.rawJSON("1e3");
+    page.entryCount = JSON.rawJSON("20e-1");
+  }));
+});
+
+for (const [field, token, diagnostic] of [
+  [
+    "version",
+    "1.0000000000000001",
+    /page 0 schema: \/version must be equal to constant/,
+  ],
+  [
+    "page",
+    "1e-500",
+    /page 0: doc\.page=1e-500 がファイル番号と不一致/,
+  ],
+  [
+    "pageSize",
+    "1000.00000000000001",
+    /page 0: pageSize は 1000 である必要があります/,
+  ],
+  [
+    "entryCount",
+    "2.0000000000000001",
+    /page 0: entryCount \(20000000000000001e-16\) が期待スライス長 \(2\) と不一致/,
+  ],
+]) {
+  test("rejects a page " + field + " mismatch hidden by Number rounding", (t) => {
+    const result = runValidator(t, ({ page }) => {
+      assert.equal(Number(token), page[field]);
+      page[field] = JSON.rawJSON(token);
+    }, { checkNumberOnly: true });
+    expectRefusal(result, diagnostic);
+  });
+}
