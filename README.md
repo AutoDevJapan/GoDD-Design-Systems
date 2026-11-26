@@ -6,4 +6,4 @@
 - [公式 Wiki](https://github.com/AutoDevJapan/GoDD-Design-Systems/wiki) — カタログの使い方、データの取得、開発と検証
 - [索引データの配布](https://github.com/AutoDevJapan/GoDD-Design-Systems/releases/tag/index-pages)
 
-ライセンスは [MIT](LICENSE) です。第三者データや書体の出典と利用条件は [NOTICE](NOTICE) を参照してください。
+ライセンスは [MIT](LICENSE) です。業種分類の出典は総務省・e-Stat です。データや書体の詳しい出典と利用条件は [NOTICE](NOTICE) を参照してください。
